@@ -3,261 +3,881 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Miruku Notes ☁️</title>
+  <title>Miruku Notes ☁️ - 雲端同步版</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
+    
     body {
-      font-family: 'Zen Maru Gothic', sans-serif;
-      background-color: #fffdf9;
+      font-family: 'Microsoft JhengHei', '微軟正黑體', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: #333;
-      padding: 2em;
-      transition: background-color 0.3s, color 0.3s;
+      margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+      transition: all 0.3s ease;
     }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
     h1 {
-      font-size: 1.8em;
-      margin-bottom: 0.5em;
       text-align: center;
+      color: white;
+      font-size: 2.5em;
+      margin-bottom: 30px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+      animation: fadeInDown 0.8s ease-out;
     }
+    
+    .sync-section {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 20px;
+      text-align: center;
+      color: white;
+    }
+    
+    .sync-id-group {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 15px;
+    }
+    
+    .sync-id-input {
+      padding: 10px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 10px;
+      background: rgba(255,255,255,0.1);
+      color: white;
+      font-size: 16px;
+      width: 200px;
+    }
+    
+    .sync-id-input::placeholder {
+      color: rgba(255,255,255,0.7);
+    }
+    
+    .sync-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 10px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.2);
+      font-size: 0.9em;
+      margin-left: 10px;
+    }
+    
+    .sync-status.online {
+      background: rgba(46, 204, 113, 0.3);
+    }
+    
+    .sync-status.offline {
+      background: rgba(231, 76, 60, 0.3);
+    }
+    
     .input-section {
-      background: #fff;
-      border: 1px solid #ddd;
-      padding: 1.5em;
-      margin: 1em 0;
-      border-radius: 12px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      animation: fadeInUp 0.8s ease-out;
     }
-    .note {
-      background: #fff;
-      border: 1px solid #ddd;
-      padding: 1em;
-      margin: 1em 0;
-      border-radius: 12px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      transition: transform 0.2s;
+    
+    .form-group {
+      margin-bottom: 20px;
     }
-    .note:hover {
+    
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+      color: #555;
+    }
+    
+    input[type="text"], textarea {
+      width: 100%;
+      padding: 15px;
+      border: 2px solid #e1e5e9;
+      border-radius: 12px;
+      font-size: 16px;
+      font-family: inherit;
+      transition: all 0.3s ease;
+      resize: vertical;
+    }
+    
+    input[type="text"]:focus, textarea:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
       transform: translateY(-2px);
     }
-    .note-category {
-      font-weight: bold;
-      color: #f8c8dc;
-      margin-bottom: 0.5em;
-    }
-    .note-content {
+    
+    textarea {
+      min-height: 120px;
       line-height: 1.6;
     }
+    
+    .button-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    
+    button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    
+    button:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
+    
+    button:active {
+      transform: translateY(0);
+    }
+    
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+      opacity: 0.7;
+    }
+    
+    .sync-btn {
+      background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+    }
+    
+    .status {
+      padding: 15px;
+      margin: 15px 0;
+      border-radius: 12px;
+      text-align: center;
+      font-weight: bold;
+      display: none;
+      animation: slideInDown 0.5s ease-out;
+    }
+    
+    .status.success {
+      background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+      color: white;
+    }
+    
+    .status.error {
+      background: linear-gradient(135deg, #fc466b 0%, #3f5efb 100%);
+      color: white;
+    }
+    
+    .status.info {
+      background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+      color: white;
+    }
+    
+    .notes-container {
+      display: grid;
+      gap: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
+    
+    .note {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+      animation: fadeIn 0.5s ease-out;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .note:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    }
+    
+    .note::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .note-category {
+      font-weight: bold;
+      color: #667eea;
+      margin-bottom: 10px;
+      font-size: 0.9em;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    .note-content {
+      line-height: 1.6;
+      margin-bottom: 15px;
+      color: #444;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+    
+    .note-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid #eee;
+    }
+    
     .note-time {
       font-size: 0.8em;
-      color: #666;
-      margin-top: 0.5em;
+      color: #888;
+      font-style: italic;
     }
-    textarea, input {
-      width: 100%;
-      padding: 0.5em;
-      margin: 0.3em 0;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      resize: vertical;
-      font-family: inherit;
-    }
-    textarea {
-      min-height: 100px;
-    }
-    button {
-      background-color: #f8c8dc;
+    
+    .delete-btn {
+      background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+      color: white;
       border: none;
-      padding: 0.5em 1em;
-      border-radius: 8px;
+      padding: 6px 12px;
+      border-radius: 20px;
       cursor: pointer;
-      margin: 0.2em;
-      transition: background-color 0.3s;
+      font-size: 12px;
+      transition: all 0.3s ease;
     }
-    button:hover {
-      background-color: #f5b7d1;
+    
+    .delete-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
     }
-    button:disabled {
-      background-color: #ccc;
-      cursor: not-allowed;
-    }
-    .controls {
+    
+    .empty-state {
       text-align: center;
-      margin: 1em 0;
+      padding: 60px 20px;
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 1.2em;
     }
-    .status {
-      padding: 0.5em;
-      margin: 0.5em 0;
-      border-radius: 8px;
+    
+    .empty-state .emoji {
+      font-size: 3em;
+      display: block;
+      margin-bottom: 20px;
+    }
+    
+    .stats {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 20px;
       text-align: center;
-      display: none;
+      color: white;
     }
-    .status.success {
-      background-color: #d4edda;
-      color: #155724;
-      border: 1px solid #c3e6cb;
+    
+    /* 暗色主題 */
+    body.dark {
+      background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
     }
-    .status.error {
-      background-color: #f8d7da;
-      color: #721c24;
-      border: 1px solid #f5c6cb;
+    
+    body.dark .input-section,
+    body.dark .note {
+      background: rgba(52, 73, 94, 0.95);
+      color: #ecf0f1;
     }
-    .dark {
-      background-color: #333;
-      color: #fff;
+    
+    body.dark input[type="text"],
+    body.dark textarea {
+      background: rgba(44, 62, 80, 0.8);
+      border-color: #34495e;
+      color: #ecf0f1;
     }
-    .dark .input-section,
-    .dark .note {
-      background-color: #444;
-      border-color: #555;
-      color: #fff;
+    
+    body.dark input[type="text"]:focus,
+    body.dark textarea:focus {
+      border-color: #3498db;
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
     }
-    .dark .note-time {
-      color: #ccc;
+    
+    body.dark .note-content {
+      color: #bdc3c7;
     }
-    .dark textarea,
-    .dark input {
-      background-color: #555;
-      border-color: #666;
-      color: #fff;
+    
+    body.dark .note-category {
+      color: #3498db;
     }
-    .dark button {
-      background-color: #555;
-      color: #fff;
+    
+    body.dark label {
+      color: #bdc3c7;
     }
-    .dark button:hover {
-      background-color: #666;
+    
+    /* 動畫 */
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
-    .loading {
-      text-align: center;
-      padding: 2em;
-      color: #666;
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    @keyframes slideInDown {
+      from {
+        transform: translateY(-20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+    
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.5; }
+      100% { opacity: 1; }
+    }
+    
+    .syncing {
+      animation: pulse 1s infinite;
+    }
+    
+    /* 響應式設計 */
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+      
+      h1 {
+        font-size: 2em;
+        margin-bottom: 20px;
+      }
+      
+      .input-section {
+        padding: 20px;
+      }
+      
+      .button-group {
+        flex-direction: column;
+      }
+      
+      button {
+        width: 100%;
+        margin-bottom: 10px;
+      }
+      
+      .notes-container {
+        grid-template-columns: 1fr;
+      }
+      
+      .sync-id-group {
+        flex-direction: column;
+      }
+      
+      .sync-id-input {
+        width: 100%;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>Miruku 雲端筆記 ☁️</h1>
-  
-  <div class="status" id="status"></div>
-  
-  <div class="input-section">
-    <label>分類：<input type="text" id="categoryInput" placeholder="輸入分類（選填）"></label>
-    <textarea id="noteInput" placeholder="輸入筆記內容..."></textarea>
-    <div class="controls">
-      <button onclick="saveNote()" id="saveBtn">💾 儲存筆記</button>
-      <button onclick="clearInputs()">🗑️ 清空</button>
-      <button onclick="toggleTheme()">🌓 切換主題</button>
+  <div class="container">
+    <h1>Miruku 雲端筆記 ☁️</h1>
+    
+    <div class="sync-section">
+      <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px;">
+        <span>🌐 雲端同步</span>
+        <span class="sync-status" id="syncStatus">
+          <span id="statusIcon">⚪</span>
+          <span id="statusText">離線模式</span>
+        </span>
+      </div>
+      
+      <div class="sync-id-group">
+        <input type="text" class="sync-id-input" id="syncId" placeholder="輸入同步 ID（自動生成）" maxlength="20">
+        <button onclick="generateSyncId()" style="background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.3); color: white;">🎲 隨機生成</button>
+        <button onclick="syncNotes()" id="syncBtn" class="sync-btn">🔄 立即同步</button>
+      </div>
+      
+      <div style="font-size: 0.9em; margin-top: 10px; opacity: 0.8;">
+        點擊「立即同步」生成分享碼，在其他裝置輸入相同 ID 即可同步筆記
+      </div>
+    </div>
+    
+    <div class="stats" id="stats">
+      <span id="noteCount">0</span> 篇筆記 | 
+      <span id="syncInfo">本地模式</span>
+    </div>
+    
+    <div class="status" id="status"></div>
+    
+    <div class="input-section">
+      <div class="form-group">
+        <label for="categoryInput">📝 分類標籤</label>
+        <input type="text" id="categoryInput" placeholder="工作、生活、想法... (選填)">
+      </div>
+      
+      <div class="form-group">
+        <label for="noteInput">✨ 筆記內容</label>
+        <textarea id="noteInput" placeholder="寫下你的想法...&#10;&#10;💡 小提示：&#10;• 按 Ctrl+Enter 快速儲存&#10;• 支援多行文字&#10;• 自動雲端同步"></textarea>
+      </div>
+      
+      <div class="button-group">
+        <button onclick="saveNote()" id="saveBtn">💾 儲存筆記</button>
+        <button onclick="clearInputs()">🗑️ 清空輸入</button>
+        <button onclick="toggleTheme()">🌓 切換主題</button>
+        <button onclick="exportNotes()">📤 匯出筆記</button>
+        <button onclick="clearAllNotes()">⚠️ 清空所有</button>
+      </div>
+    </div>
+
+    <div id="notesContainer">
+      <div class="notes-container" id="notes"></div>
     </div>
   </div>
 
-  <div id="loading" class="loading">正在載入筆記...</div>
-  <div id="notes"></div>
-
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script>
-    // Firebase 配置
-    const firebaseConfig = {
-      apiKey: "AIzaSyAxboGl9sxDdjAhitO6rLvAKbunZnqg09c",
-      authDomain: "miruku-notes.firebaseapp.com",
-      projectId: "miruku-notes",
-      storageBucket: "miruku-notes.appspot.com",
-      messagingSenderId: "533046171839",
-      appId: "1:533046171839:web:23691d6df554310f2b8e0a",
-      measurementId: "G-E3XZG8VLG6"
-    };
-    
-    // 初始化 Firebase
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-    let userId = "";
-    let notesListener = null; // 儲存監聽器引用
+    // 全域變數
+    let notes = [];
+    let noteIdCounter = 1;
+    let syncId = '';
+    let isOnline = false;
+    let autoSyncTimer = null;
 
-    // 狀態顯示函數
-    function showStatus(message, type = 'success') {
-      const statusEl = document.getElementById('status');
-      statusEl.textContent = message;
-      statusEl.className = `status ${type}`;
-      statusEl.style.display = 'block';
+    // 頁面載入時初始化
+    document.addEventListener('DOMContentLoaded', function() {
+      checkUrlParams(); // 檢查分享連結
+      loadSyncId();
+      loadNotes();
+      loadTheme();
+      updateStats();
+      showStatus('歡迎使用 Miruku Notes！✨', 'success');
       
-      // 3秒後自動隱藏
-      setTimeout(() => {
-        statusEl.style.display = 'none';
-      }, 3000);
+      // 定期提醒同步
+      setInterval(() => {
+        if (notes.length > 0 && !isOnline) {
+          showStatus('💡 提示：點擊「立即同步」分享筆記到其他裝置', 'info');
+        }
+      }, 300000); // 每5分鐘提醒一次
+    });
+
+    // 生成隨機同步 ID
+    function generateSyncId() {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      let result = '';
+      for (let i = 0; i < 8; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      document.getElementById('syncId').value = result;
+      setSyncId(result);
     }
 
-    // 匿名登錄並初始化
-    firebase.auth().signInAnonymously()
-      .then(cred => {
-        userId = cred.user.uid;
-        console.log('✅ 匿名登錄成功，用戶ID:', userId);
-        loadTheme();
-        setupRealtimeListener(); // 設置實時監聽器
-      })
-      .catch(error => {
-        console.error('❌ 登錄失敗:', error);
-        showStatus('登錄失敗，請重新載入頁面', 'error');
-      });
+    // 載入同步 ID
+    function loadSyncId() {
+      const stored = localStorage.getItem('miruku-sync-id');
+      if (stored) {
+        syncId = stored;
+        document.getElementById('syncId').value = syncId;
+        updateSyncStatus('offline', '本地模式');
+        showStatus(`同步 ID：${syncId} （點擊同步按鈕分享）`, 'info');
+      } else {
+        generateSyncId();
+      }
+    }
 
-    // 設置實時監聽器
-    function setupRealtimeListener() {
-      console.log('📡 設置實時監聽器...');
+    // 設定同步 ID
+    function setSyncId(id) {
+      syncId = id.toUpperCase();
+      localStorage.setItem('miruku-sync-id', syncId);
+      document.getElementById('syncId').value = syncId;
+      updateSyncStatus('offline', '本地模式');
+      showStatus(`同步 ID 已設定: ${syncId}`, 'info');
+    }
+
+    // 監聽同步 ID 輸入
+    document.getElementById('syncId').addEventListener('change', function() {
+      const newId = this.value.trim().toUpperCase();
+      if (newId.length >= 4) {
+        setSyncId(newId);
+      }
+    });
+
+    // 更新同步狀態
+    function updateSyncStatus(status, text) {
+      const statusEl = document.getElementById('syncStatus');
+      const iconEl = document.getElementById('statusIcon');
+      const textEl = document.getElementById('statusText');
       
-      // 如果已有監聽器，先取消
-      if (notesListener) {
-        notesListener();
+      statusEl.className = `sync-status ${status}`;
+      textEl.textContent = text;
+      
+      if (status === 'online') {
+        iconEl.textContent = '🟢';
+        document.getElementById('syncInfo').textContent = `雲端模式 (ID: ${syncId})`;
+      } else {
+        iconEl.textContent = '🔴';
+        document.getElementById('syncInfo').textContent = '本地模式';
+      }
+    }
+
+    // 簡易同步功能 - 使用分享碼
+    async function syncNotes() {
+      if (!syncId) return;
+      
+      const syncBtn = document.getElementById('syncBtn');
+      const originalText = syncBtn.textContent;
+      syncBtn.disabled = true;
+      syncBtn.textContent = '🔄 生成分享碼...';
+      
+      try {
+        // 生成分享碼（壓縮後的筆記數據）
+        const shareData = {
+          notes: notes,
+          syncId: syncId,
+          timestamp: Date.now()
+        };
+        
+        const compressed = btoa(encodeURIComponent(JSON.stringify(shareData)));
+        const shareCode = compressed.substring(0, Math.min(compressed.length, 2000)); // 限制長度
+        
+        // 儲存分享碼到瀏覽器
+        localStorage.setItem(`miruku-share-${syncId}`, shareCode);
+        
+        updateSyncStatus('online', '已生成分享碼');
+        isOnline = true;
+        showStatus('📋 分享碼已生成！可在其他裝置輸入同步ID載入', 'success');
+        
+        // 顯示分享碼選項
+        showShareCodeDialog(shareCode);
+        
+      } catch (error) {
+        console.error('生成分享碼失敗:', error);
+        updateSyncStatus('offline', '生成失敗');
+        isOnline = false;
+        showStatus('❌ 分享碼生成失敗', 'error');
+      } finally {
+        syncBtn.disabled = false;
+        syncBtn.textContent = originalText;
+      }
+    }
+
+    // 顯示分享碼對話框
+    function showShareCodeDialog(shareCode) {
+      const existingDialog = document.getElementById('shareDialog');
+      if (existingDialog) {
+        existingDialog.remove();
       }
       
-      // 設置新的監聽器
-      notesListener = db.collection("notes")
-        .where("uid", "==", userId)
-        .orderBy("timestamp", "desc")
-        .onSnapshot(
-          snapshot => {
-            console.log('📥 收到實時更新，筆記數量:', snapshot.size);
-            document.getElementById('loading').style.display = 'none';
-            renderNotes(snapshot);
-          },
-          error => {
-            console.error('⚠️ 實時監聽失敗:', error);
-            document.getElementById('loading').style.display = 'none';
-            showStatus('載入筆記失敗', 'error');
+      const dialog = document.createElement('div');
+      dialog.id = 'shareDialog';
+      dialog.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        z-index: 1000;
+        max-width: 500px;
+        width: 90%;
+        text-align: center;
+      `;
+      
+      dialog.innerHTML = `
+        <h3 style="margin-top: 0; color: #667eea;">📋 同步方式</h3>
+        <p style="margin: 15px 0; color: #666; line-height: 1.6;">
+          選擇以下任一方式在其他裝置同步你的筆記：
+        </p>
+        
+        <div style="margin: 20px 0;">
+          <strong style="color: #667eea;">方式一：同步 ID</strong>
+          <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin: 10px 0;">
+            <code style="font-size: 18px; font-weight: bold; color: #e74c3c;">${syncId}</code>
+            <br><small style="color: #666;">在其他裝置輸入此 ID</small>
+          </div>
+        </div>
+        
+        <div style="margin: 20px 0;">
+          <strong style="color: #667eea;">方式二：匯出/匯入</strong>
+          <div style="margin: 10px 0;">
+            <button onclick="exportForSync()" style="margin: 5px; padding: 10px 20px; background: #2ecc71; color: white; border: none; border-radius: 25px; cursor: pointer;">
+              📤 匯出同步檔
+            </button>
+            <br>
+            <input type="file" id="syncFileInput" accept=".json" style="display: none;" onchange="importFromSync(event)">
+            <button onclick="document.getElementById('syncFileInput').click()" style="margin: 5px; padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 25px; cursor: pointer;">
+              📥 匯入同步檔
+            </button>
+          </div>
+        </div>
+        
+        <div style="margin: 20px 0;">
+          <strong style="color: #667eea;">方式三：複製連結</strong>
+          <div style="margin: 10px 0;">
+            <button onclick="copyShareLink()" style="margin: 5px; padding: 10px 20px; background: #9b59b6; color: white; border: none; border-radius: 25px; cursor: pointer;">
+              🔗 複製分享連結
+            </button>
+          </div>
+        </div>
+        
+        <button onclick="closeShareDialog()" style="margin-top: 20px; padding: 10px 20px; background: #95a5a6; color: white; border: none; border-radius: 25px; cursor: pointer;">
+          關閉
+        </button>
+      `;
+      
+      // 添加遮罩
+      const overlay = document.createElement('div');
+      overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 999;
+      `;
+      overlay.onclick = closeShareDialog;
+      
+      document.body.appendChild(overlay);
+      document.body.appendChild(dialog);
+    }
+
+    // 關閉分享對話框
+    function closeShareDialog() {
+      const dialog = document.getElementById('shareDialog');
+      const overlay = document.querySelector('[style*="z-index: 999"]');
+      if (dialog) dialog.remove();
+      if (overlay) overlay.remove();
+    }
+
+    // 匯出同步檔
+    function exportForSync() {
+      const syncData = {
+        notes: notes,
+        syncId: syncId,
+        exportTime: new Date().toISOString(),
+        version: '1.0'
+      };
+      
+      const blob = new Blob([JSON.stringify(syncData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `miruku-sync-${syncId}-${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      showStatus('📤 同步檔已下載！', 'success');
+      closeShareDialog();
+    }
+
+    // 匯入同步檔
+    function importFromSync(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const syncData = JSON.parse(e.target.result);
+          
+          if (syncData.notes && Array.isArray(syncData.notes)) {
+            // 合併筆記
+            const importedNotes = syncData.notes;
+            const mergedNotes = mergeNotes(notes, importedNotes);
+            notes = mergedNotes;
+            
+            // 更新同步ID
+            if (syncData.syncId) {
+              syncId = syncData.syncId;
+              document.getElementById('syncId').value = syncId;
+              localStorage.setItem('miruku-sync-id', syncId);
+            }
+            
+            saveToLocal();
+            renderNotes();
+            
+            showStatus(`📥 成功匯入 ${importedNotes.length} 筆記！`, 'success');
+            closeShareDialog();
+          } else {
+            showStatus('❌ 檔案格式錯誤', 'error');
           }
-        );
+        } catch (error) {
+          showStatus('❌ 檔案讀取失敗', 'error');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    // 複製分享連結
+    function copyShareLink() {
+      const currentUrl = window.location.href;
+      const shareUrl = `${currentUrl}?sync=${syncId}`;
+      
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(shareUrl).then(() => {
+          showStatus('🔗 分享連結已複製！', 'success');
+        });
+      } else {
+        // 降級方案
+        const textArea = document.createElement('textarea');
+        textArea.value = shareUrl;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        showStatus('🔗 分享連結已複製！', 'success');
+      }
+      
+      closeShareDialog();
+    }
+
+    // 檢查URL參數載入同步ID
+    function checkUrlParams() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlSyncId = urlParams.get('sync');
+      if (urlSyncId && urlSyncId !== syncId) {
+        if (confirm(`發現分享的同步ID: ${urlSyncId}，要載入嗎？`)) {
+          document.getElementById('syncId').value = urlSyncId;
+          setSyncId(urlSyncId);
+        }
+      }
+    }
+
+    // 合併筆記（避免重複）
+    function mergeNotes(localNotes, cloudNotes) {
+      const merged = [...localNotes];
+      const localIds = new Set(localNotes.map(n => n.id));
+      
+      cloudNotes.forEach(cloudNote => {
+        if (!localIds.has(cloudNote.id)) {
+          merged.push(cloudNote);
+        }
+      });
+      
+      // 按時間排序
+      return merged.sort((a, b) => b.timestamp - a.timestamp);
+    }
+
+    // 載入本地筆記
+    function loadNotes() {
+      const stored = localStorage.getItem('miruku-notes');
+      if (stored) {
+        try {
+          notes = JSON.parse(stored);
+          notes.forEach((note, index) => {
+            if (!note.id) {
+              note.id = Date.now() + index;
+            }
+          });
+          noteIdCounter = Math.max(...notes.map(n => n.id), 0) + 1;
+        } catch (e) {
+          console.error('載入筆記失敗:', e);
+          notes = [];
+        }
+      }
+      renderNotes();
+    }
+
+    // 儲存筆記到本地
+    function saveToLocal() {
+      try {
+        localStorage.setItem('miruku-notes', JSON.stringify(notes));
+        return true;
+      } catch (e) {
+        console.error('儲存失敗:', e);
+        return false;
+      }
     }
 
     // 渲染筆記
-    function renderNotes(snapshot) {
+    function renderNotes() {
       const container = document.getElementById("notes");
       container.innerHTML = "";
       
-      if (snapshot.empty) {
-        container.innerHTML = '<div class="loading">還沒有筆記，開始寫下你的第一篇吧！✨</div>';
+      if (notes.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <span class="emoji">📝</span>
+            <p>還沒有筆記</p>
+            <p>開始寫下你的第一篇吧！</p>
+          </div>
+        `;
         return;
       }
       
-      snapshot.forEach(doc => {
-        const data = doc.data();
+      // 按時間排序（最新的在前）
+      const sortedNotes = [...notes].sort((a, b) => b.timestamp - a.timestamp);
+      
+      sortedNotes.forEach(note => {
         const div = document.createElement("div");
         div.className = "note";
         
-        // 格式化時間
-        let timeStr = '';
-        if (data.timestamp) {
-          const date = data.timestamp.toDate();
-          timeStr = `<div class="note-time">${formatDate(date)}</div>`;
-        }
+        const date = new Date(note.timestamp);
+        const timeStr = formatDate(date);
         
         div.innerHTML = `
-          <div class="note-category">${data.category || '未分類'}</div>
-          <div class="note-content">${escapeHtml(data.content)}</div>
-          ${timeStr}
+          <div class="note-category">${escapeHtml(note.category || '未分類')}</div>
+          <div class="note-content">${escapeHtml(note.content)}</div>
+          <div class="note-footer">
+            <div class="note-time">${timeStr}</div>
+            <button class="delete-btn" onclick="deleteNote(${note.id})">🗑️ 刪除</button>
+          </div>
         `;
         
         container.appendChild(div);
       });
+      
+      updateStats();
     }
 
-    // 儲存筆記
+    // 新增筆記
     function saveNote() {
       const content = document.getElementById("noteInput").value.trim();
       const category = document.getElementById("categoryInput").value.trim();
@@ -267,64 +887,141 @@
         return;
       }
       
-      // 停用按鈕防止重複提交
       const saveBtn = document.getElementById('saveBtn');
       saveBtn.disabled = true;
       saveBtn.textContent = '⏳ 儲存中...';
       
-      db.collection("notes").add({
-        uid: userId,
+      const newNote = {
+        id: noteIdCounter++,
         content: content,
         category: category,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      })
-      .then(() => {
-        console.log("✅ 筆記已儲存至 Firestore");
-        showStatus('筆記儲存成功！', 'success');
+        timestamp: Date.now()
+      };
+      
+      notes.unshift(newNote);
+      
+      if (saveToLocal()) {
+        showStatus('筆記儲存成功！🎉', 'success');
         clearInputs();
-      })
-      .catch((error) => {
-        console.error("⚠️ 儲存筆記失敗：", error);
-        showStatus('儲存失敗，請重試', 'error');
-      })
-      .finally(() => {
-        // 恢復按鈕狀態
-        saveBtn.disabled = false;
-        saveBtn.textContent = '💾 儲存筆記';
-      });
+        renderNotes();
+        
+        // 自動提醒分享
+        if (isOnline) {
+          setTimeout(() => showStatus('💡 筆記已儲存，記得定期同步到其他裝置', 'info'), 2000);
+        }
+      } else {
+        showStatus('儲存失敗，瀏覽器儲存空間可能已滿', 'error');
+        notes.shift();
+      }
+      
+      saveBtn.disabled = false;
+      saveBtn.textContent = '💾 儲存筆記';
+    }
+
+    // 刪除筆記
+    function deleteNote(id) {
+      if (confirm('確定要刪除這篇筆記嗎？')) {
+        notes = notes.filter(note => note.id !== id);
+        saveToLocal();
+        renderNotes();
+        showStatus('筆記已刪除', 'success');
+        
+        // 提醒同步
+        if (notes.length > 0) {
+          setTimeout(() => showStatus('💡 筆記已刪除，記得同步到其他裝置', 'info'), 1000);
+        }
+      }
     }
 
     // 清空輸入欄位
     function clearInputs() {
       document.getElementById("noteInput").value = "";
       document.getElementById("categoryInput").value = "";
+      document.getElementById("noteInput").focus();
     }
 
     // 切換主題
     function toggleTheme() {
-      const theme = document.body.classList.toggle("dark") ? "dark" : "light";
-      
-      // 儲存主題設定到 Firestore
-      if (userId) {
-        db.collection("users").doc(userId).set({ theme }, { merge: true })
-          .catch(error => console.error('主題儲存失敗:', error));
+      const isDark = document.body.classList.toggle("dark");
+      localStorage.setItem('miruku-theme', isDark ? 'dark' : 'light');
+      showStatus(`已切換到${isDark ? '暗色' : '亮色'}主題`, 'success');
+    }
+
+    // 載入主題
+    function loadTheme() {
+      const theme = localStorage.getItem('miruku-theme');
+      if (theme === 'dark') {
+        document.body.classList.add("dark");
       }
     }
 
-    // 載入主題設定
-    function loadTheme() {
-      if (!userId) return;
+    // 顯示狀態訊息
+    function showStatus(message, type = 'success') {
+      const statusEl = document.getElementById('status');
+      statusEl.textContent = message;
+      statusEl.className = `status ${type}`;
+      statusEl.style.display = 'block';
       
-      db.collection("users").doc(userId).get()
-        .then(doc => {
-          if (doc.exists && doc.data().theme === "dark") {
-            document.body.classList.add("dark");
-          }
-        })
-        .catch(error => console.error('載入主題失敗:', error));
+      setTimeout(() => {
+        statusEl.style.display = 'none';
+      }, 3000);
     }
 
-    // 工具函數：格式化日期
+    // 更新統計
+    function updateStats() {
+      document.getElementById('noteCount').textContent = notes.length;
+    }
+
+    // 匯出筆記
+    function exportNotes() {
+      if (notes.length === 0) {
+        showStatus('沒有筆記可以匯出', 'error');
+        return;
+      }
+      
+      let exportText = `Miruku Notes 匯出檔案\n生成時間: ${new Date().toLocaleString('zh-TW')}\n同步 ID: ${syncId}\n\n`;
+      exportText += '=' .repeat(50) + '\n\n';
+      
+      notes.forEach((note, index) => {
+        const date = new Date(note.timestamp).toLocaleString('zh-TW');
+        exportText += `【${index + 1}】${note.category || '未分類'}\n`;
+        exportText += `時間: ${date}\n`;
+        exportText += `內容: ${note.content}\n`;
+        exportText += '-'.repeat(30) + '\n\n';
+      });
+      
+      const blob = new Blob([exportText], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `miruku-notes-${syncId}-${new Date().toISOString().slice(0, 10)}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      showStatus('筆記已匯出！📤', 'success');
+    }
+
+    // 清空所有筆記
+    function clearAllNotes() {
+      if (notes.length === 0) {
+        showStatus('沒有筆記需要清空', 'error');
+        return;
+      }
+      
+      if (confirm(`確定要刪除所有 ${notes.length} 篇筆記嗎？此動作無法復原！`)) {
+        notes = [];
+        saveToLocal();
+        renderNotes();
+        showStatus('所有筆記已清空', 'success');
+        
+        // 提醒同步
+        setTimeout(() => showStatus('💡 所有筆記已清空，記得同步到其他裝置', 'info'), 1000);
+      }
+    }
+
+    // 格式化日期
     function formatDate(date) {
       const now = new Date();
       const diff = now - date;
@@ -346,26 +1043,51 @@
       });
     }
 
-    // 工具函數：轉義 HTML
+    // HTML 轉義
     function escapeHtml(text) {
       const div = document.createElement('div');
       div.textContent = text;
-      return div.innerHTML.replace(/\n/g, '<br>');
+      return div.innerHTML;
     }
 
     // 鍵盤快捷鍵
     document.addEventListener('keydown', function(e) {
-      // Ctrl+Enter 儲存筆記
       if (e.ctrlKey && e.key === 'Enter') {
         e.preventDefault();
         saveNote();
       }
+      
+      if (e.key === 'Escape') {
+        clearInputs();
+        closeShareDialog(); // 關閉分享對話框
+      }
+      
+      if (e.ctrlKey && e.key === 's') {
+        e.preventDefault();
+        syncNotes(); // 打開同步選項
+      }
     });
 
-    // 頁面關閉時清理監聽器
-    window.addEventListener('beforeunload', function() {
-      if (notesListener) {
-        notesListener();
+    // 自動儲存草稿
+    let autoSaveTimer;
+    document.getElementById('noteInput').addEventListener('input', function() {
+      clearTimeout(autoSaveTimer);
+      autoSaveTimer = setTimeout(() => {
+        const content = this.value.trim();
+        if (content) {
+          localStorage.setItem('miruku-draft', content);
+        }
+      }, 1000);
+    });
+
+    // 載入草稿
+    window.addEventListener('load', function() {
+      const draft = localStorage.getItem('miruku-draft');
+      if (draft && !document.getElementById('noteInput').value) {
+        if (confirm('發現未完成的草稿，要載入嗎？')) {
+          document.getElementById('noteInput').value = draft;
+        }
+        localStorage.removeItem('miruku-draft');
       }
     });
   </script>
