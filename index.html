@@ -1,50 +1,57 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Miruku Notes 雲端同步修正版</title>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Miruku Notes ☁️</title>
   <style>
     body {
       font-family: 'Zen Maru Gothic', sans-serif;
-      background-color: #FFFDF9;
-      color: #444;
-      padding: 2rem;
-    }
-    body.dark {
-      background-color: #2B2B2B;
-      color: #EDEDED;
+      background-color: #fffdf9;
+      color: #333;
+      padding: 2em;
     }
     h1 {
-      color: #E4717A;
-      border-left: 6px solid #F8C8DC;
-      padding-left: 0.6rem;
-    }
-    input, textarea, button {
-      width: 100%;
-      margin: 0.5rem 0;
-      padding: 0.6rem;
+      font-size: 1.8em;
+      margin-bottom: 0.5em;
     }
     .note {
-      background: #fffafc;
-      border-left: 6px solid #F8C8DC;
-      padding: 1rem;
-      margin-top: 1rem;
+      background: #fff;
+      border: 1px solid #ddd;
+      padding: 1em;
+      margin: 1em 0;
+      border-radius: 12px;
+    }
+    textarea, input {
+      width: 100%;
+      padding: 0.5em;
+      margin: 0.3em 0;
+    }
+    button {
+      background-color: #f8c8dc;
+      border: none;
+      padding: 0.5em 1em;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .dark {
+      background-color: #333;
+      color: #fff;
     }
   </style>
 </head>
 <body>
-  <h1>Miruku Notes ☁️</h1>
-  <button onclick="toggleTheme()">🌓 切換日夜模式</button>
-  <input type="text" id="title" placeholder="輸入筆記標題">
-  <textarea id="content" placeholder="輸入筆記內容"></textarea>
-  <input type="text" id="category" placeholder="輸入分類">
-  <button onclick="saveNote()">📒 儲存 / 更新筆記</button>
+  <h1>Miruku 雲端筆記 ☁️</h1>
+  <label>分類：<input type="text" id="categoryInput" placeholder="輸入分類"></label>
+  <textarea id="noteInput" placeholder="輸入筆記內容..."></textarea>
+  <button onclick="saveNote()">💾 儲存筆記</button>
   <div id="notes"></div>
+  <button onclick="toggleTheme()">🌓 切換主題</button>
 
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyAxboGl9sxDdjAhitO6rLvAKbunZnqg09c",
@@ -52,97 +59,60 @@
       projectId: "miruku-notes",
       storageBucket: "miruku-notes.appspot.com",
       messagingSenderId: "533046171839",
-      appId: "1:533046171839:web:23691d6df554310f2b8e0a"
+      appId: "1:533046171839:web:23691d6df554310f2b8e0a",
+      measurementId: "G-E3XZG8VLG6"
     };
-
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
-    const auth = firebase.auth();
+    let userId = "";
 
-    let uid = "";
-    let currentEditId = null;
-
-    auth.signInAnonymously().then(() => {
-      auth.onAuthStateChanged(async user => {
-        if (user) {
-          uid = user.uid;
-          loadTheme();
-          loadNotes();
-        }
-      });
+    firebase.auth().signInAnonymously().then(cred => {
+      userId = cred.user.uid;
+      loadNotes();
+      loadTheme();
     });
 
-    function toggleTheme() {
-      const isDark = document.body.classList.toggle('dark');
-      db.collection("users").doc(uid).collection("settings").doc("preferences").set({ theme: isDark ? 'dark' : 'light' });
-    }
-
-    function loadTheme() {
-      db.collection("users").doc(uid).collection("settings").doc("preferences").get().then(doc => {
-        if (doc.exists && doc.data().theme === 'dark') {
-          document.body.classList.add('dark');
-        }
-      });
-    }
-
     function saveNote() {
-      const title = document.getElementById('title').value;
-      const content = document.getElementById('content').value;
-      const category = document.getElementById('category').value;
-
-      const note = { title, content, category, time: Date.now() };
-      const notesRef = db.collection("users").doc(uid).collection("notes");
-
-      if (currentEditId) {
-        notesRef.doc(currentEditId).set(note).then(() => {
-          currentEditId = null;
-          resetForm();
-          loadNotes();
-        });
-      } else {
-        notesRef.add(note).then(() => {
-          resetForm();
-          loadNotes();
-        });
-      }
-    }
-
-    function resetForm() {
-      document.getElementById('title').value = "";
-      document.getElementById('content').value = "";
-      document.getElementById('category').value = "";
+      const content = document.getElementById("noteInput").value;
+      const category = document.getElementById("categoryInput").value;
+      if (!content) return;
+      db.collection("notes").add({
+        uid: userId,
+        content,
+        category,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
+        document.getElementById("noteInput").value = "";
+        document.getElementById("categoryInput").value = "";
+      });
     }
 
     function loadNotes() {
-      const notesRef = db.collection("users").doc(uid).collection("notes").orderBy("time", "desc");
-      notesRef.get().then(snapshot => {
-        const container = document.getElementById('notes');
-        container.innerHTML = '';
-        snapshot.forEach(doc => {
-          const note = doc.data();
-          const div = document.createElement('div');
-          div.className = 'note';
-          div.innerHTML = `
-            <b>${note.title}</b><br>
-            ${note.content}<br>
-            <small>分類：${note.category || '未分類'}</small><br>
-            <button onclick="editNote('${doc.id}', \`${note.title}\`, \`${note.content}\`, \`${note.category}\`)">編輯</button>
-            <button onclick="deleteNote('${doc.id}')">刪除</button>
-          `;
-          container.appendChild(div);
+      db.collection("notes").where("uid", "==", userId).orderBy("timestamp", "desc")
+        .onSnapshot(snapshot => {
+          const container = document.getElementById("notes");
+          container.innerHTML = "";
+          snapshot.forEach(doc => {
+            const data = doc.data();
+            const div = document.createElement("div");
+            div.className = "note";
+            div.innerHTML = `<strong>${data.category || '未分類'}</strong><br>${data.content}`;
+            container.appendChild(div);
+          });
         });
+    }
+
+    function toggleTheme() {
+      const theme = document.body.classList.toggle("dark") ? "dark" : "light";
+      db.collection("users").doc(userId).set({ theme }, { merge: true });
+    }
+
+    function loadTheme() {
+      db.collection("users").doc(userId).get().then(doc => {
+        if (doc.exists && doc.data().theme === "dark") {
+          document.body.classList.add("dark");
+        }
       });
-    }
-
-    function editNote(id, title, content, category) {
-      document.getElementById('title').value = title;
-      document.getElementById('content').value = content;
-      document.getElementById('category').value = category;
-      currentEditId = id;
-    }
-
-    function deleteNote(id) {
-      db.collection("users").doc(uid).collection("notes").doc(id).delete().then(() => loadNotes());
     }
   </script>
 </body>
