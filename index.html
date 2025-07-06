@@ -10,10 +10,20 @@
       background-color: #fffdf9;
       color: #333;
       padding: 2em;
+      transition: background-color 0.3s, color 0.3s;
     }
     h1 {
       font-size: 1.8em;
       margin-bottom: 0.5em;
+      text-align: center;
+    }
+    .input-section {
+      background: #fff;
+      border: 1px solid #ddd;
+      padding: 1.5em;
+      margin: 1em 0;
+      border-radius: 12px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
     .note {
       background: #fff;
@@ -21,11 +31,36 @@
       padding: 1em;
       margin: 1em 0;
       border-radius: 12px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      transition: transform 0.2s;
+    }
+    .note:hover {
+      transform: translateY(-2px);
+    }
+    .note-category {
+      font-weight: bold;
+      color: #f8c8dc;
+      margin-bottom: 0.5em;
+    }
+    .note-content {
+      line-height: 1.6;
+    }
+    .note-time {
+      font-size: 0.8em;
+      color: #666;
+      margin-top: 0.5em;
     }
     textarea, input {
       width: 100%;
       padding: 0.5em;
       margin: 0.3em 0;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      resize: vertical;
+      font-family: inherit;
+    }
+    textarea {
+      min-height: 100px;
     }
     button {
       background-color: #f8c8dc;
@@ -33,26 +68,94 @@
       padding: 0.5em 1em;
       border-radius: 8px;
       cursor: pointer;
+      margin: 0.2em;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #f5b7d1;
+    }
+    button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+    .controls {
+      text-align: center;
+      margin: 1em 0;
+    }
+    .status {
+      padding: 0.5em;
+      margin: 0.5em 0;
+      border-radius: 8px;
+      text-align: center;
+      display: none;
+    }
+    .status.success {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    .status.error {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
     }
     .dark {
       background-color: #333;
       color: #fff;
     }
+    .dark .input-section,
+    .dark .note {
+      background-color: #444;
+      border-color: #555;
+      color: #fff;
+    }
+    .dark .note-time {
+      color: #ccc;
+    }
+    .dark textarea,
+    .dark input {
+      background-color: #555;
+      border-color: #666;
+      color: #fff;
+    }
+    .dark button {
+      background-color: #555;
+      color: #fff;
+    }
+    .dark button:hover {
+      background-color: #666;
+    }
+    .loading {
+      text-align: center;
+      padding: 2em;
+      color: #666;
+    }
   </style>
 </head>
 <body>
   <h1>Miruku 雲端筆記 ☁️</h1>
-  <label>分類：<input type="text" id="categoryInput" placeholder="輸入分類"></label>
-  <textarea id="noteInput" placeholder="輸入筆記內容..."></textarea>
-  <button onclick="saveNote()">💾 儲存筆記</button>
+  
+  <div class="status" id="status"></div>
+  
+  <div class="input-section">
+    <label>分類：<input type="text" id="categoryInput" placeholder="輸入分類（選填）"></label>
+    <textarea id="noteInput" placeholder="輸入筆記內容..."></textarea>
+    <div class="controls">
+      <button onclick="saveNote()" id="saveBtn">💾 儲存筆記</button>
+      <button onclick="clearInputs()">🗑️ 清空</button>
+      <button onclick="toggleTheme()">🌓 切換主題</button>
+    </div>
+  </div>
+
+  <div id="loading" class="loading">正在載入筆記...</div>
   <div id="notes"></div>
-  <button onclick="toggleTheme()">🌓 切換主題</button>
 
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script>
+    // Firebase 配置
     const firebaseConfig = {
       apiKey: "AIzaSyAxboGl9sxDdjAhitO6rLvAKbunZnqg09c",
       authDomain: "miruku-notes.firebaseapp.com",
@@ -62,73 +165,209 @@
       appId: "1:533046171839:web:23691d6df554310f2b8e0a",
       measurementId: "G-E3XZG8VLG6"
     };
+    
+    // 初始化 Firebase
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     let userId = "";
+    let notesListener = null; // 儲存監聽器引用
 
-    firebase.auth().signInAnonymously().then(cred => {
-      userId = cred.user.uid;
-      loadNotes();
-      loadTheme();
-    });
+    // 狀態顯示函數
+    function showStatus(message, type = 'success') {
+      const statusEl = document.getElementById('status');
+      statusEl.textContent = message;
+      statusEl.className = `status ${type}`;
+      statusEl.style.display = 'block';
+      
+      // 3秒後自動隱藏
+      setTimeout(() => {
+        statusEl.style.display = 'none';
+      }, 3000);
+    }
 
-    function saveNote() {
-      const content = document.getElementById("noteInput").value;
-      const category = document.getElementById("categoryInput").value;
-      if (!content.trim()) {
-        console.warn("❌ 無內容，筆記未儲存");
+    // 匿名登錄並初始化
+    firebase.auth().signInAnonymously()
+      .then(cred => {
+        userId = cred.user.uid;
+        console.log('✅ 匿名登錄成功，用戶ID:', userId);
+        loadTheme();
+        setupRealtimeListener(); // 設置實時監聽器
+      })
+      .catch(error => {
+        console.error('❌ 登錄失敗:', error);
+        showStatus('登錄失敗，請重新載入頁面', 'error');
+      });
+
+    // 設置實時監聽器
+    function setupRealtimeListener() {
+      console.log('📡 設置實時監聽器...');
+      
+      // 如果已有監聽器，先取消
+      if (notesListener) {
+        notesListener();
+      }
+      
+      // 設置新的監聽器
+      notesListener = db.collection("notes")
+        .where("uid", "==", userId)
+        .orderBy("timestamp", "desc")
+        .onSnapshot(
+          snapshot => {
+            console.log('📥 收到實時更新，筆記數量:', snapshot.size);
+            document.getElementById('loading').style.display = 'none';
+            renderNotes(snapshot);
+          },
+          error => {
+            console.error('⚠️ 實時監聽失敗:', error);
+            document.getElementById('loading').style.display = 'none';
+            showStatus('載入筆記失敗', 'error');
+          }
+        );
+    }
+
+    // 渲染筆記
+    function renderNotes(snapshot) {
+      const container = document.getElementById("notes");
+      container.innerHTML = "";
+      
+      if (snapshot.empty) {
+        container.innerHTML = '<div class="loading">還沒有筆記，開始寫下你的第一篇吧！✨</div>';
         return;
       }
+      
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const div = document.createElement("div");
+        div.className = "note";
+        
+        // 格式化時間
+        let timeStr = '';
+        if (data.timestamp) {
+          const date = data.timestamp.toDate();
+          timeStr = `<div class="note-time">${formatDate(date)}</div>`;
+        }
+        
+        div.innerHTML = `
+          <div class="note-category">${data.category || '未分類'}</div>
+          <div class="note-content">${escapeHtml(data.content)}</div>
+          ${timeStr}
+        `;
+        
+        container.appendChild(div);
+      });
+    }
+
+    // 儲存筆記
+    function saveNote() {
+      const content = document.getElementById("noteInput").value.trim();
+      const category = document.getElementById("categoryInput").value.trim();
+      
+      if (!content) {
+        showStatus('請輸入筆記內容', 'error');
+        return;
+      }
+      
+      // 停用按鈕防止重複提交
+      const saveBtn = document.getElementById('saveBtn');
+      saveBtn.disabled = true;
+      saveBtn.textContent = '⏳ 儲存中...';
+      
       db.collection("notes").add({
         uid: userId,
-        content,
-        category,
+        content: content,
+        category: category,
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
       })
       .then(() => {
         console.log("✅ 筆記已儲存至 Firestore");
-        document.getElementById("noteInput").value = "";
-        document.getElementById("categoryInput").value = "";
-        loadNotes(); // 強制更新
+        showStatus('筆記儲存成功！', 'success');
+        clearInputs();
       })
       .catch((error) => {
         console.error("⚠️ 儲存筆記失敗：", error);
+        showStatus('儲存失敗，請重試', 'error');
+      })
+      .finally(() => {
+        // 恢復按鈕狀態
+        saveBtn.disabled = false;
+        saveBtn.textContent = '💾 儲存筆記';
       });
     }
 
-    function loadNotes() {
-      console.log("📥 正在載入筆記...");
-      db.collection("notes").where("uid", "==", userId).orderBy("timestamp", "desc")
-        .get()
-        .then(snapshot => {
-          const container = document.getElementById("notes");
-          container.innerHTML = "";
-          snapshot.forEach(doc => {
-            const data = doc.data();
-            console.log("📝 載入筆記：", data);
-            const div = document.createElement("div");
-            div.className = "note";
-            div.innerHTML = `<strong>${data.category || '未分類'}</strong><br>${data.content}`;
-            container.appendChild(div);
-          });
-        })
-        .catch((error) => {
-          console.error("⚠️ 載入筆記失敗：", error);
-        });
+    // 清空輸入欄位
+    function clearInputs() {
+      document.getElementById("noteInput").value = "";
+      document.getElementById("categoryInput").value = "";
     }
 
+    // 切換主題
     function toggleTheme() {
       const theme = document.body.classList.toggle("dark") ? "dark" : "light";
-      db.collection("users").doc(userId).set({ theme }, { merge: true });
+      
+      // 儲存主題設定到 Firestore
+      if (userId) {
+        db.collection("users").doc(userId).set({ theme }, { merge: true })
+          .catch(error => console.error('主題儲存失敗:', error));
+      }
     }
 
+    // 載入主題設定
     function loadTheme() {
-      db.collection("users").doc(userId).get().then(doc => {
-        if (doc.exists && doc.data().theme === "dark") {
-          document.body.classList.add("dark");
-        }
+      if (!userId) return;
+      
+      db.collection("users").doc(userId).get()
+        .then(doc => {
+          if (doc.exists && doc.data().theme === "dark") {
+            document.body.classList.add("dark");
+          }
+        })
+        .catch(error => console.error('載入主題失敗:', error));
+    }
+
+    // 工具函數：格式化日期
+    function formatDate(date) {
+      const now = new Date();
+      const diff = now - date;
+      const minutes = Math.floor(diff / 60000);
+      const hours = Math.floor(diff / 3600000);
+      const days = Math.floor(diff / 86400000);
+      
+      if (minutes < 1) return '剛剛';
+      if (minutes < 60) return `${minutes}分鐘前`;
+      if (hours < 24) return `${hours}小時前`;
+      if (days < 7) return `${days}天前`;
+      
+      return date.toLocaleDateString('zh-TW', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
       });
     }
+
+    // 工具函數：轉義 HTML
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML.replace(/\n/g, '<br>');
+    }
+
+    // 鍵盤快捷鍵
+    document.addEventListener('keydown', function(e) {
+      // Ctrl+Enter 儲存筆記
+      if (e.ctrlKey && e.key === 'Enter') {
+        e.preventDefault();
+        saveNote();
+      }
+    });
+
+    // 頁面關閉時清理監聽器
+    window.addEventListener('beforeunload', function() {
+      if (notesListener) {
+        notesListener();
+      }
+    });
   </script>
 </body>
 </html>
