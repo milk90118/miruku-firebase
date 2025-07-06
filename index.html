@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Miruku Notes ☁️ - 雲端同步版</title>
+  <title>Miruku Notes ☁️ - 真正跨裝置同步</title>
   <style>
     * {
       box-sizing: border-box;
@@ -43,46 +43,40 @@
       color: white;
     }
     
-    .sync-id-group {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-top: 15px;
+    .sync-methods {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
     }
     
-    .sync-id-input {
+    .sync-method {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 15px;
+      text-align: center;
+    }
+    
+    .sync-method h4 {
+      margin: 0 0 10px 0;
+      color: #fff;
+    }
+    
+    .sync-method button {
+      width: 100%;
       padding: 10px;
-      border: 2px solid rgba(255,255,255,0.3);
-      border-radius: 10px;
-      background: rgba(255,255,255,0.1);
-      color: white;
-      font-size: 16px;
-      width: 200px;
-    }
-    
-    .sync-id-input::placeholder {
-      color: rgba(255,255,255,0.7);
-    }
-    
-    .sync-status {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 5px 10px;
+      border: none;
       border-radius: 20px;
-      background: rgba(255,255,255,0.2);
-      font-size: 0.9em;
-      margin-left: 10px;
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
     }
     
-    .sync-status.online {
-      background: rgba(46, 204, 113, 0.3);
-    }
-    
-    .sync-status.offline {
-      background: rgba(231, 76, 60, 0.3);
+    .sync-method button:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
     }
     
     .input-section {
@@ -163,10 +157,6 @@
       cursor: not-allowed;
       transform: none;
       opacity: 0.7;
-    }
-    
-    .sync-btn {
-      background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
     }
     
     .status {
@@ -298,19 +288,72 @@
       color: white;
     }
     
+    /* 對話框樣式 */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .modal-content {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 30px;
+      max-width: 500px;
+      width: 90%;
+      text-align: center;
+      position: relative;
+    }
+    
+    .modal textarea, .modal input {
+      width: 100%;
+      margin: 10px 0;
+      padding: 15px;
+      border: 2px solid #e1e5e9;
+      border-radius: 12px;
+      font-family: inherit;
+    }
+    
+    .modal button {
+      margin: 5px;
+      padding: 10px 20px;
+    }
+    
+    .close-btn {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #666;
+    }
+    
     /* 暗色主題 */
     body.dark {
       background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
     }
     
     body.dark .input-section,
-    body.dark .note {
+    body.dark .note,
+    body.dark .modal-content {
       background: rgba(52, 73, 94, 0.95);
       color: #ecf0f1;
     }
     
     body.dark input[type="text"],
-    body.dark textarea {
+    body.dark textarea,
+    body.dark .modal input,
+    body.dark .modal textarea {
       background: rgba(44, 62, 80, 0.8);
       border-color: #34495e;
       color: #ecf0f1;
@@ -373,16 +416,6 @@
       }
     }
     
-    @keyframes pulse {
-      0% { opacity: 1; }
-      50% { opacity: 0.5; }
-      100% { opacity: 1; }
-    }
-    
-    .syncing {
-      animation: pulse 1s infinite;
-    }
-    
     /* 響應式設計 */
     @media (max-width: 768px) {
       body {
@@ -411,12 +444,8 @@
         grid-template-columns: 1fr;
       }
       
-      .sync-id-group {
-        flex-direction: column;
-      }
-      
-      .sync-id-input {
-        width: 100%;
+      .sync-methods {
+        grid-template-columns: 1fr;
       }
     }
   </style>
@@ -426,28 +455,37 @@
     <h1>Miruku 雲端筆記 ☁️</h1>
     
     <div class="sync-section">
-      <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px;">
-        <span>🌐 雲端同步</span>
-        <span class="sync-status" id="syncStatus">
-          <span id="statusIcon">⚪</span>
-          <span id="statusText">離線模式</span>
-        </span>
+      <h3 style="margin-top: 0;">🌐 跨裝置同步</h3>
+      
+      <div class="sync-methods">
+        <div class="sync-method">
+          <h4>📤 分享連結</h4>
+          <p style="font-size: 0.9em; margin: 10px 0;">生成包含所有筆記的分享連結</p>
+          <button onclick="generateShareLink()">生成分享連結</button>
+        </div>
+        
+        <div class="sync-method">
+          <h4>📥 載入分享</h4>
+          <p style="font-size: 0.9em; margin: 10px 0;">從分享連結載入筆記</p>
+          <button onclick="showLoadModal()">貼上分享連結</button>
+        </div>
+        
+        <div class="sync-method">
+          <h4>💾 檔案同步</h4>
+          <p style="font-size: 0.9em; margin: 10px 0;">匯出/匯入 JSON 檔案</p>
+          <button onclick="exportNotes()">匯出檔案</button>
+          <input type="file" id="fileInput" accept=".json" style="display: none;" onchange="importNotes(event)">
+          <button onclick="document.getElementById('fileInput').click()" style="margin-top: 5px;">匯入檔案</button>
+        </div>
       </div>
       
-      <div class="sync-id-group">
-        <input type="text" class="sync-id-input" id="syncId" placeholder="輸入同步 ID（自動生成）" maxlength="20">
-        <button onclick="generateSyncId()" style="background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.3); color: white;">🎲 隨機生成</button>
-        <button onclick="syncNotes()" id="syncBtn" class="sync-btn">🔄 立即同步</button>
-      </div>
-      
-      <div style="font-size: 0.9em; margin-top: 10px; opacity: 0.8;">
-        點擊「立即同步」生成分享碼，在其他裝置輸入相同 ID 即可同步筆記
+      <div style="font-size: 0.9em; margin-top: 15px; opacity: 0.8;">
+        💡 三種方式任選：分享連結最方便，檔案同步最安全
       </div>
     </div>
     
     <div class="stats" id="stats">
-      <span id="noteCount">0</span> 篇筆記 | 
-      <span id="syncInfo">本地模式</span>
+      <span id="noteCount">0</span> 篇筆記 | 本地儲存模式 📱
     </div>
     
     <div class="status" id="status"></div>
@@ -460,14 +498,13 @@
       
       <div class="form-group">
         <label for="noteInput">✨ 筆記內容</label>
-        <textarea id="noteInput" placeholder="寫下你的想法...&#10;&#10;💡 小提示：&#10;• 按 Ctrl+Enter 快速儲存&#10;• 支援多行文字&#10;• 自動雲端同步"></textarea>
+        <textarea id="noteInput" placeholder="寫下你的想法...&#10;&#10;💡 小提示：&#10;• 按 Ctrl+Enter 快速儲存&#10;• 支援多行文字&#10;• 可跨裝置同步"></textarea>
       </div>
       
       <div class="button-group">
         <button onclick="saveNote()" id="saveBtn">💾 儲存筆記</button>
         <button onclick="clearInputs()">🗑️ 清空輸入</button>
         <button onclick="toggleTheme()">🌓 切換主題</button>
-        <button onclick="exportNotes()">📤 匯出筆記</button>
         <button onclick="clearAllNotes()">⚠️ 清空所有</button>
       </div>
     </div>
@@ -477,327 +514,205 @@
     </div>
   </div>
 
+  <!-- 對話框 -->
+  <div class="modal" id="shareModal">
+    <div class="modal-content">
+      <button class="close-btn" onclick="closeModal()">&times;</button>
+      <h3 id="modalTitle">分享連結</h3>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
   <script>
     // 全域變數
     let notes = [];
     let noteIdCounter = 1;
-    let syncId = '';
-    let isOnline = false;
-    let autoSyncTimer = null;
 
     // 頁面載入時初始化
     document.addEventListener('DOMContentLoaded', function() {
-      checkUrlParams(); // 檢查分享連結
-      loadSyncId();
+      checkUrlParams(); // 檢查是否有分享的筆記
       loadNotes();
       loadTheme();
       updateStats();
       showStatus('歡迎使用 Miruku Notes！✨', 'success');
+    });
+
+    // 檢查 URL 參數
+    function checkUrlParams() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const sharedData = urlParams.get('data');
       
-      // 定期提醒同步
-      setInterval(() => {
-        if (notes.length > 0 && !isOnline) {
-          showStatus('💡 提示：點擊「立即同步」分享筆記到其他裝置', 'info');
+      if (sharedData) {
+        try {
+          const decodedData = atob(sharedData);
+          const parsedData = JSON.parse(decodeURIComponent(decodedData));
+          
+          if (parsedData.notes && Array.isArray(parsedData.notes)) {
+            if (confirm(`發現分享的 ${parsedData.notes.length} 篇筆記，要載入嗎？\n\n來源：${parsedData.source || '未知'}\n時間：${new Date(parsedData.timestamp).toLocaleString()}`)) {
+              // 合併筆記
+              const mergedNotes = mergeNotes(notes, parsedData.notes);
+              notes = mergedNotes;
+              saveToLocal();
+              renderNotes();
+              showStatus(`✅ 成功載入 ${parsedData.notes.length} 篇分享筆記！`, 'success');
+            }
+          }
+        } catch (e) {
+          showStatus('❌ 分享連結格式錯誤', 'error');
         }
-      }, 300000); // 每5分鐘提醒一次
-    });
-
-    // 生成隨機同步 ID
-    function generateSyncId() {
-      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-      let result = '';
-      for (let i = 0; i < 8; i++) {
-        result += chars.charAt(Math.floor(Math.random() * chars.length));
-      }
-      document.getElementById('syncId').value = result;
-      setSyncId(result);
-    }
-
-    // 載入同步 ID
-    function loadSyncId() {
-      const stored = localStorage.getItem('miruku-sync-id');
-      if (stored) {
-        syncId = stored;
-        document.getElementById('syncId').value = syncId;
-        updateSyncStatus('offline', '本地模式');
-        showStatus(`同步 ID：${syncId} （點擊同步按鈕分享）`, 'info');
-      } else {
-        generateSyncId();
+        
+        // 清除 URL 參數（保持整潔）
+        window.history.replaceState({}, document.title, window.location.pathname);
       }
     }
 
-    // 設定同步 ID
-    function setSyncId(id) {
-      syncId = id.toUpperCase();
-      localStorage.setItem('miruku-sync-id', syncId);
-      document.getElementById('syncId').value = syncId;
-      updateSyncStatus('offline', '本地模式');
-      showStatus(`同步 ID 已設定: ${syncId}`, 'info');
-    }
-
-    // 監聽同步 ID 輸入
-    document.getElementById('syncId').addEventListener('change', function() {
-      const newId = this.value.trim().toUpperCase();
-      if (newId.length >= 4) {
-        setSyncId(newId);
+    // 生成分享連結
+    function generateShareLink() {
+      if (notes.length === 0) {
+        showStatus('沒有筆記可以分享', 'error');
+        return;
       }
-    });
-
-    // 更新同步狀態
-    function updateSyncStatus(status, text) {
-      const statusEl = document.getElementById('syncStatus');
-      const iconEl = document.getElementById('statusIcon');
-      const textEl = document.getElementById('statusText');
-      
-      statusEl.className = `sync-status ${status}`;
-      textEl.textContent = text;
-      
-      if (status === 'online') {
-        iconEl.textContent = '🟢';
-        document.getElementById('syncInfo').textContent = `雲端模式 (ID: ${syncId})`;
-      } else {
-        iconEl.textContent = '🔴';
-        document.getElementById('syncInfo').textContent = '本地模式';
-      }
-    }
-
-    // 簡易同步功能 - 使用分享碼
-    async function syncNotes() {
-      if (!syncId) return;
-      
-      const syncBtn = document.getElementById('syncBtn');
-      const originalText = syncBtn.textContent;
-      syncBtn.disabled = true;
-      syncBtn.textContent = '🔄 生成分享碼...';
       
       try {
-        // 生成分享碼（壓縮後的筆記數據）
         const shareData = {
           notes: notes,
-          syncId: syncId,
-          timestamp: Date.now()
+          timestamp: Date.now(),
+          source: 'Miruku Notes',
+          version: '1.0'
         };
         
-        const compressed = btoa(encodeURIComponent(JSON.stringify(shareData)));
-        const shareCode = compressed.substring(0, Math.min(compressed.length, 2000)); // 限制長度
+        const encodedData = btoa(encodeURIComponent(JSON.stringify(shareData)));
+        const shareUrl = `${window.location.origin}${window.location.pathname}?data=${encodedData}`;
         
-        // 儲存分享碼到瀏覽器
-        localStorage.setItem(`miruku-share-${syncId}`, shareCode);
+        // 檢查 URL 長度
+        if (shareUrl.length > 8000) {
+          showStatus('⚠️ 筆記太多，連結可能過長。建議使用檔案匯出功能。', 'error');
+          return;
+        }
         
-        updateSyncStatus('online', '已生成分享碼');
-        isOnline = true;
-        showStatus('📋 分享碼已生成！可在其他裝置輸入同步ID載入', 'success');
-        
-        // 顯示分享碼選項
-        showShareCodeDialog(shareCode);
+        showShareModal('分享連結已生成！', `
+          <p>📱 <strong>分享方式：</strong></p>
+          <textarea readonly style="height: 100px; font-size: 12px;">${shareUrl}</textarea>
+          <div style="margin: 15px 0;">
+            <button onclick="copyToClipboard('${shareUrl}')" style="background: #2ecc71;">📋 複製連結</button>
+            <button onclick="shareViaQR('${shareUrl}')" style="background: #9b59b6;">📱 產生 QR Code</button>
+          </div>
+          <p style="font-size: 0.9em; color: #666;">
+            💡 把連結傳給其他裝置，打開即可載入所有筆記
+          </p>
+        `);
         
       } catch (error) {
-        console.error('生成分享碼失敗:', error);
-        updateSyncStatus('offline', '生成失敗');
-        isOnline = false;
-        showStatus('❌ 分享碼生成失敗', 'error');
-      } finally {
-        syncBtn.disabled = false;
-        syncBtn.textContent = originalText;
+        showStatus('❌ 生成分享連結失敗', 'error');
       }
     }
 
-    // 顯示分享碼對話框
-    function showShareCodeDialog(shareCode) {
-      const existingDialog = document.getElementById('shareDialog');
-      if (existingDialog) {
-        existingDialog.remove();
-      }
-      
-      const dialog = document.createElement('div');
-      dialog.id = 'shareDialog';
-      dialog.style.cssText = `
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
-        padding: 30px;
-        border-radius: 20px;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-        z-index: 1000;
-        max-width: 500px;
-        width: 90%;
-        text-align: center;
-      `;
-      
-      dialog.innerHTML = `
-        <h3 style="margin-top: 0; color: #667eea;">📋 同步方式</h3>
-        <p style="margin: 15px 0; color: #666; line-height: 1.6;">
-          選擇以下任一方式在其他裝置同步你的筆記：
+    // 顯示載入對話框
+    function showLoadModal() {
+      showShareModal('載入分享筆記', `
+        <p>📥 <strong>貼上分享連結：</strong></p>
+        <textarea id="shareUrlInput" placeholder="貼上完整的分享連結..." style="height: 100px;"></textarea>
+        <div style="margin: 15px 0;">
+          <button onclick="loadFromShareUrl()" style="background: #3498db;">📥 載入筆記</button>
+        </div>
+        <p style="font-size: 0.9em; color: #666;">
+          💡 貼上別人分享給你的連結，或掃描 QR Code 後複製連結
         </p>
-        
-        <div style="margin: 20px 0;">
-          <strong style="color: #667eea;">方式一：同步 ID</strong>
-          <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin: 10px 0;">
-            <code style="font-size: 18px; font-weight: bold; color: #e74c3c;">${syncId}</code>
-            <br><small style="color: #666;">在其他裝置輸入此 ID</small>
-          </div>
-        </div>
-        
-        <div style="margin: 20px 0;">
-          <strong style="color: #667eea;">方式二：匯出/匯入</strong>
-          <div style="margin: 10px 0;">
-            <button onclick="exportForSync()" style="margin: 5px; padding: 10px 20px; background: #2ecc71; color: white; border: none; border-radius: 25px; cursor: pointer;">
-              📤 匯出同步檔
-            </button>
-            <br>
-            <input type="file" id="syncFileInput" accept=".json" style="display: none;" onchange="importFromSync(event)">
-            <button onclick="document.getElementById('syncFileInput').click()" style="margin: 5px; padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 25px; cursor: pointer;">
-              📥 匯入同步檔
-            </button>
-          </div>
-        </div>
-        
-        <div style="margin: 20px 0;">
-          <strong style="color: #667eea;">方式三：複製連結</strong>
-          <div style="margin: 10px 0;">
-            <button onclick="copyShareLink()" style="margin: 5px; padding: 10px 20px; background: #9b59b6; color: white; border: none; border-radius: 25px; cursor: pointer;">
-              🔗 複製分享連結
-            </button>
-          </div>
-        </div>
-        
-        <button onclick="closeShareDialog()" style="margin-top: 20px; padding: 10px 20px; background: #95a5a6; color: white; border: none; border-radius: 25px; cursor: pointer;">
-          關閉
-        </button>
-      `;
-      
-      // 添加遮罩
-      const overlay = document.createElement('div');
-      overlay.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.5);
-        z-index: 999;
-      `;
-      overlay.onclick = closeShareDialog;
-      
-      document.body.appendChild(overlay);
-      document.body.appendChild(dialog);
+      `);
     }
 
-    // 關閉分享對話框
-    function closeShareDialog() {
-      const dialog = document.getElementById('shareDialog');
-      const overlay = document.querySelector('[style*="z-index: 999"]');
-      if (dialog) dialog.remove();
-      if (overlay) overlay.remove();
-    }
-
-    // 匯出同步檔
-    function exportForSync() {
-      const syncData = {
-        notes: notes,
-        syncId: syncId,
-        exportTime: new Date().toISOString(),
-        version: '1.0'
-      };
+    // 從分享 URL 載入
+    function loadFromShareUrl() {
+      const shareUrl = document.getElementById('shareUrlInput').value.trim();
       
-      const blob = new Blob([JSON.stringify(syncData, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `miruku-sync-${syncId}-${new Date().toISOString().slice(0, 10)}.json`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      if (!shareUrl) {
+        showStatus('請貼上分享連結', 'error');
+        return;
+      }
       
-      showStatus('📤 同步檔已下載！', 'success');
-      closeShareDialog();
-    }
-
-    // 匯入同步檔
-    function importFromSync(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        try {
-          const syncData = JSON.parse(e.target.result);
-          
-          if (syncData.notes && Array.isArray(syncData.notes)) {
-            // 合併筆記
-            const importedNotes = syncData.notes;
-            const mergedNotes = mergeNotes(notes, importedNotes);
-            notes = mergedNotes;
-            
-            // 更新同步ID
-            if (syncData.syncId) {
-              syncId = syncData.syncId;
-              document.getElementById('syncId').value = syncId;
-              localStorage.setItem('miruku-sync-id', syncId);
-            }
-            
-            saveToLocal();
-            renderNotes();
-            
-            showStatus(`📥 成功匯入 ${importedNotes.length} 筆記！`, 'success');
-            closeShareDialog();
-          } else {
-            showStatus('❌ 檔案格式錯誤', 'error');
-          }
-        } catch (error) {
-          showStatus('❌ 檔案讀取失敗', 'error');
+      try {
+        const url = new URL(shareUrl);
+        const sharedData = url.searchParams.get('data');
+        
+        if (!sharedData) {
+          showStatus('❌ 連結中沒有找到筆記數據', 'error');
+          return;
         }
-      };
-      reader.readAsText(file);
+        
+        const decodedData = atob(sharedData);
+        const parsedData = JSON.parse(decodeURIComponent(decodedData));
+        
+        if (parsedData.notes && Array.isArray(parsedData.notes)) {
+          // 合併筆記
+          const mergedNotes = mergeNotes(notes, parsedData.notes);
+          notes = mergedNotes;
+          saveToLocal();
+          renderNotes();
+          
+          closeModal();
+          showStatus(`✅ 成功載入 ${parsedData.notes.length} 篇筆記！`, 'success');
+        } else {
+          showStatus('❌ 連結格式錯誤', 'error');
+        }
+        
+      } catch (error) {
+        showStatus('❌ 載入失敗，請檢查連結格式', 'error');
+      }
     }
 
-    // 複製分享連結
-    function copyShareLink() {
-      const currentUrl = window.location.href;
-      const shareUrl = `${currentUrl}?sync=${syncId}`;
-      
+    // 複製到剪貼板
+    function copyToClipboard(text) {
       if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(shareUrl).then(() => {
-          showStatus('🔗 分享連結已複製！', 'success');
+        navigator.clipboard.writeText(text).then(() => {
+          showStatus('📋 連結已複製到剪貼板！', 'success');
+          closeModal();
         });
       } else {
         // 降級方案
         const textArea = document.createElement('textarea');
-        textArea.value = shareUrl;
+        textArea.value = text;
         document.body.appendChild(textArea);
         textArea.select();
         document.execCommand('copy');
         document.body.removeChild(textArea);
-        showStatus('🔗 分享連結已複製！', 'success');
+        showStatus('📋 連結已複製！', 'success');
+        closeModal();
       }
-      
-      closeShareDialog();
     }
 
-    // 檢查URL參數載入同步ID
-    function checkUrlParams() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const urlSyncId = urlParams.get('sync');
-      if (urlSyncId && urlSyncId !== syncId) {
-        if (confirm(`發現分享的同步ID: ${urlSyncId}，要載入嗎？`)) {
-          document.getElementById('syncId').value = urlSyncId;
-          setSyncId(urlSyncId);
-        }
-      }
+    // 生成 QR Code（簡化版）
+    function shareViaQR(url) {
+      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(url)}`;
+      showShareModal('QR Code 分享', `
+        <p>📱 <strong>掃描 QR Code：</strong></p>
+        <img src="${qrUrl}" alt="QR Code" style="max-width: 100%; margin: 15px 0;">
+        <p style="font-size: 0.9em; color: #666;">
+          用手機掃描此 QR Code 即可開啟分享連結
+        </p>
+        <button onclick="copyToClipboard('${url}')" style="background: #2ecc71;">📋 複製連結</button>
+      `);
+    }
+
+    // 顯示對話框
+    function showShareModal(title, content) {
+      document.getElementById('modalTitle').textContent = title;
+      document.getElementById('modalContent').innerHTML = content;
+      document.getElementById('shareModal').style.display = 'flex';
+    }
+
+    // 關閉對話框
+    function closeModal() {
+      document.getElementById('shareModal').style.display = 'none';
     }
 
     // 合併筆記（避免重複）
-    function mergeNotes(localNotes, cloudNotes) {
+    function mergeNotes(localNotes, newNotes) {
       const merged = [...localNotes];
       const localIds = new Set(localNotes.map(n => n.id));
       
-      cloudNotes.forEach(cloudNote => {
-        if (!localIds.has(cloudNote.id)) {
-          merged.push(cloudNote);
+      newNotes.forEach(newNote => {
+        if (!localIds.has(newNote.id)) {
+          merged.push(newNote);
         }
       });
       
@@ -904,11 +819,6 @@
         showStatus('筆記儲存成功！🎉', 'success');
         clearInputs();
         renderNotes();
-        
-        // 自動提醒分享
-        if (isOnline) {
-          setTimeout(() => showStatus('💡 筆記已儲存，記得定期同步到其他裝置', 'info'), 2000);
-        }
       } else {
         showStatus('儲存失敗，瀏覽器儲存空間可能已滿', 'error');
         notes.shift();
@@ -925,11 +835,6 @@
         saveToLocal();
         renderNotes();
         showStatus('筆記已刪除', 'success');
-        
-        // 提醒同步
-        if (notes.length > 0) {
-          setTimeout(() => showStatus('💡 筆記已刪除，記得同步到其他裝置', 'info'), 1000);
-        }
       }
     }
 
@@ -979,28 +884,55 @@
         return;
       }
       
-      let exportText = `Miruku Notes 匯出檔案\n生成時間: ${new Date().toLocaleString('zh-TW')}\n同步 ID: ${syncId}\n\n`;
-      exportText += '=' .repeat(50) + '\n\n';
+      const exportData = {
+        notes: notes,
+        exportTime: new Date().toISOString(),
+        source: 'Miruku Notes',
+        version: '1.0'
+      };
       
-      notes.forEach((note, index) => {
-        const date = new Date(note.timestamp).toLocaleString('zh-TW');
-        exportText += `【${index + 1}】${note.category || '未分類'}\n`;
-        exportText += `時間: ${date}\n`;
-        exportText += `內容: ${note.content}\n`;
-        exportText += '-'.repeat(30) + '\n\n';
-      });
-      
-      const blob = new Blob([exportText], { type: 'text/plain;charset=utf-8' });
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `miruku-notes-${syncId}-${new Date().toISOString().slice(0, 10)}.txt`;
+      a.download = `miruku-notes-${new Date().toISOString().slice(0, 10)}.json`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
       
-      showStatus('筆記已匯出！📤', 'success');
+      showStatus('📤 筆記已匯出！', 'success');
+    }
+
+    // 匯入筆記
+    function importNotes(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const importData = JSON.parse(e.target.result);
+          
+          if (importData.notes && Array.isArray(importData.notes)) {
+            const mergedNotes = mergeNotes(notes, importData.notes);
+            notes = mergedNotes;
+            
+            saveToLocal();
+            renderNotes();
+            
+            showStatus(`📥 成功匯入 ${importData.notes.length} 篇筆記！`, 'success');
+          } else {
+            showStatus('❌ 檔案格式錯誤', 'error');
+          }
+        } catch (error) {
+          showStatus('❌ 檔案讀取失敗', 'error');
+        }
+      };
+      reader.readAsText(file);
+      
+      // 清空輸入，允許重複選擇同一檔案
+      event.target.value = '';
     }
 
     // 清空所有筆記
@@ -1012,12 +944,9 @@
       
       if (confirm(`確定要刪除所有 ${notes.length} 篇筆記嗎？此動作無法復原！`)) {
         notes = [];
-        saveToLocal();
+        localStorage.removeItem('miruku-notes');
         renderNotes();
         showStatus('所有筆記已清空', 'success');
-        
-        // 提醒同步
-        setTimeout(() => showStatus('💡 所有筆記已清空，記得同步到其他裝置', 'info'), 1000);
       }
     }
 
@@ -1059,12 +988,14 @@
       
       if (e.key === 'Escape') {
         clearInputs();
-        closeShareDialog(); // 關閉分享對話框
+        closeModal();
       }
-      
-      if (e.ctrlKey && e.key === 's') {
-        e.preventDefault();
-        syncNotes(); // 打開同步選項
+    });
+
+    // 點擊對話框外部關閉
+    document.getElementById('shareModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeModal();
       }
     });
 
