@@ -10,13 +10,29 @@
     }
     
     body {
-      font-family: 'Microsoft JhengHei', '微軟正黑體', sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: #333;
+      font-family: 'Microsoft JhengHei', '微軟正黑體', 'Hiragino Sans', 'Yu Gothic', sans-serif;
+      background: linear-gradient(135deg, #FFE4E1 0%, #FFF0F5 50%, #E6E6FA 100%);
+      color: #5D4E75;
       margin: 0;
       padding: 20px;
       min-height: 100vh;
-      transition: all 0.3s ease;
+      transition: all 0.5s ease;
+      position: relative;
+    }
+    
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 20% 20%, rgba(255, 182, 193, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(221, 160, 221, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(175, 238, 238, 0.2) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: -1;
     }
     
     .container {
@@ -26,21 +42,25 @@
     
     h1 {
       text-align: center;
-      color: white;
+      color: #8B4A6B;
       font-size: 2.5em;
       margin-bottom: 30px;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+      text-shadow: 2px 2px 4px rgba(139, 74, 107, 0.2);
       animation: fadeInDown 0.8s ease-out;
+      font-weight: 300;
+      letter-spacing: 2px;
     }
     
     .sync-section {
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-      border-radius: 15px;
-      padding: 20px;
-      margin-bottom: 20px;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 182, 193, 0.3);
+      border-radius: 20px;
+      padding: 25px;
+      margin-bottom: 25px;
       text-align: center;
-      color: white;
+      color: #6B5B73;
+      box-shadow: 0 8px 32px rgba(255, 182, 193, 0.3);
     }
     
     .sync-methods {
@@ -51,41 +71,59 @@
     }
     
     .sync-method {
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 12px;
-      padding: 15px;
+      background: linear-gradient(135deg, rgba(255, 182, 193, 0.6) 0%, rgba(255, 240, 245, 0.8) 100%);
+      border: 1px solid rgba(255, 182, 193, 0.4);
+      border-radius: 16px;
+      padding: 20px;
       text-align: center;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 16px rgba(255, 182, 193, 0.2);
+    }
+    
+    .sync-method:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(255, 182, 193, 0.4);
+      background: linear-gradient(135deg, rgba(255, 182, 193, 0.8) 0%, rgba(255, 240, 245, 0.9) 100%);
     }
     
     .sync-method h4 {
-      margin: 0 0 10px 0;
-      color: #fff;
+      margin: 0 0 12px 0;
+      color: #8B4A6B;
+      font-weight: 500;
+    }
+    
+    .sync-method p {
+      color: #9B7E9B;
+      margin: 12px 0;
     }
     
     .sync-method button {
       width: 100%;
-      padding: 10px;
+      padding: 12px;
       border: none;
-      border-radius: 20px;
-      background: rgba(255, 255, 255, 0.2);
-      color: white;
-      font-weight: bold;
+      border-radius: 25px;
+      background: linear-gradient(135deg, #F8BBD9 0%, #E4B7E5 100%);
+      color: #6B4C6D;
+      font-weight: 600;
       cursor: pointer;
       transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(248, 187, 217, 0.4);
     }
     
     .sync-method button:hover {
-      background: rgba(255, 255, 255, 0.3);
+      background: linear-gradient(135deg, #F5A9D0 0%, #E0ACE6 100%);
       transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(248, 187, 217, 0.6);
     }
     
     .input-section {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-      border-radius: 20px;
-      padding: 30px;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 228, 225, 0.6);
+      border-radius: 25px;
+      padding: 35px;
       margin-bottom: 30px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      box-shadow: 0 12px 40px rgba(255, 182, 193, 0.2);
       animation: fadeInUp 0.8s ease-out;
     }
     
@@ -160,28 +198,36 @@
     }
     
     .status {
-      padding: 15px;
-      margin: 15px 0;
-      border-radius: 12px;
+      padding: 16px;
+      margin: 16px 0;
+      border-radius: 16px;
       text-align: center;
-      font-weight: bold;
+      font-weight: 600;
       display: none;
       animation: slideInDown 0.5s ease-out;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
     }
     
     .status.success {
-      background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-      color: white;
+      background: linear-gradient(135deg, rgba(152, 216, 200, 0.9) 0%, rgba(186, 230, 217, 0.9) 100%);
+      color: #2d5a52;
+      border-color: rgba(152, 216, 200, 0.6);
+      box-shadow: 0 8px 25px rgba(152, 216, 200, 0.4);
     }
     
     .status.error {
-      background: linear-gradient(135deg, #fc466b 0%, #3f5efb 100%);
-      color: white;
+      background: linear-gradient(135deg, rgba(255, 182, 193, 0.9) 0%, rgba(255, 192, 203, 0.9) 100%);
+      color: #8B4A6B;
+      border-color: rgba(255, 182, 193, 0.6);
+      box-shadow: 0 8px 25px rgba(255, 182, 193, 0.4);
     }
     
     .status.info {
-      background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-      color: white;
+      background: linear-gradient(135deg, rgba(188, 226, 232, 0.9) 0%, rgba(173, 216, 230, 0.9) 100%);
+      color: #4682B4;
+      border-color: rgba(188, 226, 232, 0.6);
+      box-shadow: 0 8px 25px rgba(188, 226, 232, 0.4);
     }
     
     .notes-container {
@@ -191,11 +237,12 @@
     }
     
     .note {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-      border-radius: 16px;
-      padding: 20px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 228, 225, 0.6);
+      border-radius: 20px;
+      padding: 25px;
+      box-shadow: 0 8px 30px rgba(255, 182, 193, 0.2);
       transition: all 0.3s ease;
       animation: fadeIn 0.5s ease-out;
       position: relative;
@@ -203,8 +250,9 @@
     }
     
     .note:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+      transform: translateY(-8px);
+      box-shadow: 0 15px 40px rgba(255, 182, 193, 0.3);
+      border-color: rgba(248, 187, 217, 0.8);
     }
     
     .note::before {
@@ -213,79 +261,203 @@
       top: 0;
       left: 0;
       right: 0;
-      height: 4px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      height: 5px;
+      background: linear-gradient(135deg, #F8BBD9 0%, #E4B7E5 50%, #98D8C8 100%);
     }
     
     .note-category {
-      font-weight: bold;
-      color: #667eea;
-      margin-bottom: 10px;
+      font-weight: 600;
+      color: #8B4A6B;
+      margin-bottom: 12px;
       font-size: 0.9em;
       text-transform: uppercase;
-      letter-spacing: 1px;
+      letter-spacing: 1.2px;
+      background: linear-gradient(135deg, rgba(248, 187, 217, 0.3) 0%, rgba(228, 183, 229, 0.3) 100%);
+      padding: 6px 12px;
+      border-radius: 12px;
+      display: inline-block;
     }
     
     .note-content {
-      line-height: 1.6;
-      margin-bottom: 15px;
-      color: #444;
+      line-height: 1.7;
+      margin-bottom: 18px;
+      color: #6B5B73;
       white-space: pre-wrap;
       word-wrap: break-word;
+      font-size: 1.05em;
     }
     
     .note-footer {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-top: 15px;
-      padding-top: 15px;
-      border-top: 1px solid #eee;
+      margin-top: 18px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(255, 182, 193, 0.2);
     }
     
     .note-time {
-      font-size: 0.8em;
-      color: #888;
+      font-size: 0.85em;
+      color: #B8A5B8;
       font-style: italic;
+      font-weight: 500;
     }
     
     .delete-btn {
-      background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
-      color: white;
-      border: none;
-      padding: 6px 12px;
+      background: linear-gradient(135deg, #FFB6C1 0%, #FFA0B4 100%);
+      color: #8B4A6B;
+      border: 1px solid rgba(255, 182, 193, 0.5);
+      padding: 8px 16px;
       border-radius: 20px;
       cursor: pointer;
       font-size: 12px;
+      font-weight: 600;
       transition: all 0.3s ease;
     }
     
     .delete-btn:hover {
+      background: linear-gradient(135deg, #FF91A4 0%, #FF7F9A 100%);
       transform: scale(1.05);
-      box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
+      box-shadow: 0 6px 15px rgba(255, 182, 193, 0.5);
     }
     
     .empty-state {
       text-align: center;
-      padding: 60px 20px;
-      color: rgba(255, 255, 255, 0.8);
+      padding: 80px 20px;
+      color: rgba(139, 74, 107, 0.8);
       font-size: 1.2em;
+      background: rgba(255, 255, 255, 0.6);
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 228, 225, 0.5);
     }
     
     .empty-state .emoji {
-      font-size: 3em;
+      font-size: 4em;
       display: block;
-      margin-bottom: 20px;
+      margin-bottom: 25px;
+      filter: drop-shadow(2px 2px 4px rgba(255, 182, 193, 0.3));
     }
     
     .stats {
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-      border-radius: 12px;
-      padding: 15px;
-      margin-bottom: 20px;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 182, 193, 0.3);
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 25px;
       text-align: center;
+      color: #8B4A6B;
+      box-shadow: 0 8px 25px rgba(255, 182, 193, 0.2);
+      font-weight: 500;
+    }
+    
+    /* QR Code 掃描器樣式 */
+    .qr-scanner {
+      position: relative;
+      width: 100%;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+    
+    .qr-video {
+      width: 100%;
+      height: auto;
+      border-radius: 15px;
+      background: #000;
+      box-shadow: 0 8px 25px rgba(255, 182, 193, 0.3);
+    }
+    
+    .qr-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 200px;
+      height: 200px;
+      border: 3px solid #F8BBD9;
+      border-radius: 15px;
+      box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
+    }
+    
+    .qr-overlay::before {
+      content: '';
+      position: absolute;
+      top: -15px;
+      left: -15px;
+      right: -15px;
+      bottom: -15px;
+      border: 2px dashed #E4B7E5;
+      border-radius: 25px;
+      animation: qr-scan 2s infinite;
+    }
+    
+    @keyframes qr-scan {
+      0%, 100% { 
+        opacity: 1; 
+        border-color: #E4B7E5;
+      }
+      50% { 
+        opacity: 0.5; 
+        border-color: #F8BBD9;
+      }
+    }
+    
+    .qr-status {
+      text-align: center;
+      margin: 15px 0;
+      padding: 12px;
+      background: rgba(139, 74, 107, 0.8);
       color: white;
+      border-radius: 12px;
+      font-size: 0.9em;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
+    
+    .qr-controls {
+      text-align: center;
+      margin: 15px 0;
+    }
+    
+    .qr-controls button {
+      margin: 0 8px;
+      padding: 10px 18px;
+      font-size: 14px;
+      border-radius: 20px;
+    }
+    
+    /* 暗色主題的 QR 掃描器 */
+    body.dark .qr-video {
+      box-shadow: 0 8px 25px rgba(139, 69, 19, 0.4);
+    }
+    
+    body.dark .qr-overlay {
+      border-color: #A0522D;
+    }
+    
+    body.dark .qr-overlay::before {
+      border-color: #8B4513;
+    }
+    
+    @keyframes qr-scan-dark {
+      0%, 100% { 
+        opacity: 1; 
+        border-color: #8B4513;
+      }
+      50% { 
+        opacity: 0.5; 
+        border-color: #A0522D;
+      }
+    }
+    
+    body.dark .qr-overlay::before {
+      animation: qr-scan-dark 2s infinite;
+    }
+    
+    body.dark .qr-status {
+      background: rgba(139, 69, 19, 0.9);
+      color: #F5DEB3;
     }
     
     /* 對話框樣式 */
@@ -295,7 +467,8 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0,0,0,0.5);
+      background: rgba(139, 74, 107, 0.6);
+      backdrop-filter: blur(5px);
       z-index: 1000;
       display: none;
       align-items: center;
@@ -304,77 +477,249 @@
     
     .modal-content {
       background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-      border-radius: 20px;
-      padding: 30px;
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 228, 225, 0.6);
+      border-radius: 25px;
+      padding: 35px;
       max-width: 500px;
       width: 90%;
       text-align: center;
       position: relative;
+      box-shadow: 0 15px 50px rgba(255, 182, 193, 0.3);
+      color: #6B5B73;
     }
     
     .modal textarea, .modal input {
       width: 100%;
-      margin: 10px 0;
-      padding: 15px;
-      border: 2px solid #e1e5e9;
-      border-radius: 12px;
+      margin: 12px 0;
+      padding: 16px;
+      border: 2px solid rgba(255, 182, 193, 0.3);
+      border-radius: 15px;
       font-family: inherit;
+      background: rgba(255, 250, 250, 0.8);
+      color: #6B4C6D;
+    }
+    
+    .modal textarea:focus, .modal input:focus {
+      border-color: #F8BBD9;
+      box-shadow: 0 0 0 4px rgba(248, 187, 217, 0.2);
+      outline: none;
     }
     
     .modal button {
-      margin: 5px;
-      padding: 10px 20px;
+      margin: 8px;
+      padding: 12px 24px;
     }
     
     .close-btn {
       position: absolute;
-      top: 15px;
-      right: 15px;
+      top: 20px;
+      right: 20px;
       background: none;
       border: none;
-      font-size: 24px;
+      font-size: 28px;
       cursor: pointer;
-      color: #666;
+      color: #B8A5B8;
+      transition: all 0.3s ease;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
     }
     
-    /* 暗色主題 */
+    .close-btn:hover {
+      background: rgba(255, 182, 193, 0.2);
+      color: #8B4A6B;
+      transform: rotate(90deg);
+    }
+    
+    /* 暗色主題的對話框 */
+    body.dark .modal {
+      background: rgba(44, 24, 16, 0.8);
+    }
+    
+    body.dark .modal-content {
+      background: rgba(60, 40, 35, 0.95);
+      border-color: rgba(139, 69, 19, 0.4);
+      box-shadow: 0 15px 50px rgba(139, 69, 19, 0.4);
+      color: #E8D5D0;
+    }
+    
+    body.dark .close-btn {
+      color: #A0926B;
+    }
+    
+    body.dark .close-btn:hover {
+      background: rgba(139, 69, 19, 0.3);
+      color: #D4AF94;
+    }
+    
+    /* 暗色主題 - 日系深夜配色 */
     body.dark {
-      background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+      background: linear-gradient(135deg, #2C1810 0%, #3D2B1F 50%, #4A2C2A 100%);
+      color: #E8D5D0;
+    }
+    
+    body.dark::before {
+      background: 
+        radial-gradient(circle at 20% 20%, rgba(139, 69, 19, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(75, 45, 75, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(47, 79, 79, 0.2) 0%, transparent 50%);
+    }
+    
+    body.dark h1 {
+      color: #D4AF94;
+      text-shadow: 2px 2px 4px rgba(212, 175, 148, 0.3);
+    }
+    
+    body.dark .sync-section {
+      background: rgba(60, 40, 35, 0.9);
+      border-color: rgba(139, 69, 19, 0.4);
+      color: #D4AF94;
+      box-shadow: 0 8px 32px rgba(139, 69, 19, 0.3);
+    }
+    
+    body.dark .sync-method {
+      background: linear-gradient(135deg, rgba(139, 69, 19, 0.6) 0%, rgba(75, 45, 75, 0.6) 100%);
+      border-color: rgba(139, 69, 19, 0.5);
+    }
+    
+    body.dark .sync-method:hover {
+      background: linear-gradient(135deg, rgba(139, 69, 19, 0.8) 0%, rgba(75, 45, 75, 0.8) 100%);
+      box-shadow: 0 8px 25px rgba(139, 69, 19, 0.4);
+    }
+    
+    body.dark .sync-method h4 {
+      color: #D4AF94;
+    }
+    
+    body.dark .sync-method p {
+      color: #B8A08C;
+    }
+    
+    body.dark .sync-method button {
+      background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+      color: #F5DEB3;
+      border: 1px solid rgba(139, 69, 19, 0.6);
+      box-shadow: 0 4px 15px rgba(139, 69, 19, 0.4);
+    }
+    
+    body.dark .sync-method button:hover {
+      background: linear-gradient(135deg, #A0522D 0%, #CD853F 100%);
+      box-shadow: 0 6px 20px rgba(139, 69, 19, 0.6);
     }
     
     body.dark .input-section,
     body.dark .note,
     body.dark .modal-content {
-      background: rgba(52, 73, 94, 0.95);
-      color: #ecf0f1;
+      background: rgba(60, 40, 35, 0.95);
+      border-color: rgba(139, 69, 19, 0.4);
+      color: #E8D5D0;
+      box-shadow: 0 12px 40px rgba(139, 69, 19, 0.3);
+    }
+    
+    body.dark .note:hover {
+      border-color: rgba(160, 82, 45, 0.8);
+      box-shadow: 0 15px 40px rgba(139, 69, 19, 0.4);
+    }
+    
+    body.dark .note::before {
+      background: linear-gradient(135deg, #8B4513 0%, #4B2D4B 50%, #2F4F4F 100%);
     }
     
     body.dark input[type="text"],
     body.dark textarea,
     body.dark .modal input,
     body.dark .modal textarea {
-      background: rgba(44, 62, 80, 0.8);
-      border-color: #34495e;
-      color: #ecf0f1;
+      background: rgba(45, 25, 20, 0.8);
+      border-color: rgba(139, 69, 19, 0.4);
+      color: #E8D5D0;
     }
     
     body.dark input[type="text"]:focus,
     body.dark textarea:focus {
-      border-color: #3498db;
-      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+      border-color: #A0522D;
+      box-shadow: 0 0 0 4px rgba(160, 82, 45, 0.3);
+      background: rgba(60, 40, 35, 0.95);
+    }
+    
+    body.dark input[type="text"]::placeholder,
+    body.dark textarea::placeholder {
+      color: #8B7D70;
+    }
+    
+    body.dark button {
+      background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+      color: #F5DEB3;
+      border-color: rgba(139, 69, 19, 0.6);
+      box-shadow: 0 6px 20px rgba(139, 69, 19, 0.4);
+    }
+    
+    body.dark button:hover:not(:disabled) {
+      background: linear-gradient(135deg, #A0522D 0%, #CD853F 100%);
+      box-shadow: 0 8px 25px rgba(139, 69, 19, 0.6);
     }
     
     body.dark .note-content {
-      color: #bdc3c7;
+      color: #D4C4B8;
     }
     
     body.dark .note-category {
-      color: #3498db;
+      color: #D4AF94;
+      background: linear-gradient(135deg, rgba(139, 69, 19, 0.4) 0%, rgba(75, 45, 75, 0.4) 100%);
+    }
+    
+    body.dark .note-time {
+      color: #A0926B;
+    }
+    
+    body.dark .delete-btn {
+      background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+      color: #F5DEB3;
+      border-color: rgba(139, 69, 19, 0.6);
+    }
+    
+    body.dark .delete-btn:hover {
+      background: linear-gradient(135deg, #A0522D 0%, #CD853F 100%);
+      box-shadow: 0 6px 15px rgba(139, 69, 19, 0.5);
     }
     
     body.dark label {
-      color: #bdc3c7;
+      color: #D4AF94;
+    }
+    
+    body.dark .stats {
+      background: rgba(60, 40, 35, 0.9);
+      border-color: rgba(139, 69, 19, 0.4);
+      color: #D4AF94;
+      box-shadow: 0 8px 25px rgba(139, 69, 19, 0.3);
+    }
+    
+    body.dark .empty-state {
+      background: rgba(60, 40, 35, 0.8);
+      border-color: rgba(139, 69, 19, 0.4);
+      color: rgba(212, 175, 148, 0.9);
+    }
+    
+    body.dark .empty-state .emoji {
+      filter: drop-shadow(2px 2px 4px rgba(139, 69, 19, 0.4));
+    }
+    
+    body.dark .status.success {
+      background: linear-gradient(135deg, rgba(47, 79, 79, 0.9) 0%, rgba(60, 95, 95, 0.9) 100%);
+      color: #B8E6E6;
+      border-color: rgba(47, 79, 79, 0.6);
+    }
+    
+    body.dark .status.error {
+      background: linear-gradient(135deg, rgba(139, 69, 19, 0.9) 0%, rgba(160, 82, 45, 0.9) 100%);
+      color: #F5DEB3;
+      border-color: rgba(139, 69, 19, 0.6);
+    }
+    
+    body.dark .status.info {
+      background: linear-gradient(135deg, rgba(75, 45, 75, 0.9) 0%, rgba(95, 60, 95, 0.9) 100%);
+      color: #E6D6E6;
+      border-color: rgba(75, 45, 75, 0.6);
     }
     
     /* 動畫 */
@@ -466,8 +811,9 @@
         
         <div class="sync-method">
           <h4>📥 載入分享</h4>
-          <p style="font-size: 0.9em; margin: 10px 0;">從分享連結載入筆記</p>
+          <p style="font-size: 0.9em; margin: 10px 0;">從分享連結或掃描 QR Code</p>
           <button onclick="showLoadModal()">貼上分享連結</button>
+          <button onclick="startQRScanner()" style="margin-top: 5px; background: #e67e22;">📷 掃描 QR Code</button>
         </div>
         
         <div class="sync-method">
@@ -480,7 +826,7 @@
       </div>
       
       <div style="font-size: 0.9em; margin-top: 15px; opacity: 0.8;">
-        💡 三種方式任選：分享連結最方便，檔案同步最安全
+                  💡 三種方式任選：分享連結最方便，檔案同步最安全，QR Code 最快速
       </div>
     </div>
     
@@ -523,6 +869,8 @@
     </div>
   </div>
 
+  <!-- QR Code 掃描庫 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
   <script>
     // 全域變數
     let notes = [];
@@ -536,6 +884,225 @@
       updateStats();
       showStatus('歡迎使用 Miruku Notes！✨', 'success');
     });
+
+    // QR Code 掃描相關變數
+    let qrScanner = null;
+    let qrVideo = null;
+    let qrCanvas = null;
+    let qrContext = null;
+    let isScanning = false;
+
+    // 啟動 QR Code 掃描器
+    function startQRScanner() {
+      if (!window.jsQR) {
+        showStatus('❌ QR Code 掃描功能載入失敗', 'error');
+        return;
+      }
+      
+      showShareModal('📷 QR Code 掃描器', `
+        <div class="qr-scanner">
+          <video id="qrVideo" class="qr-video" playsinline></video>
+          <div class="qr-overlay"></div>
+          <canvas id="qrCanvas" style="display: none;"></canvas>
+        </div>
+        <div class="qr-status" id="qrStatus">正在啟動相機...</div>
+        <div class="qr-controls">
+          <button onclick="stopQRScanner()" style="background: #e74c3c;">❌ 停止掃描</button>
+          <button onclick="switchCamera()" style="background: #f39c12;">🔄 切換相機</button>
+        </div>
+        <p style="font-size: 0.9em; color: #666; margin-top: 15px;">
+          💡 將 QR Code 對準綠色框框，掃描後會自動載入筆記
+        </p>
+      `);
+      
+      // 延遲一點讓 DOM 元素渲染完成
+      setTimeout(initQRScanner, 100);
+    }
+
+    // 初始化 QR 掃描器
+    async function initQRScanner() {
+      try {
+        qrVideo = document.getElementById('qrVideo');
+        qrCanvas = document.getElementById('qrCanvas');
+        qrContext = qrCanvas.getContext('2d');
+        
+        // 請求相機權限
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: 'environment', // 優先使用後鏡頭
+            width: { ideal: 1280 },
+            height: { ideal: 720 }
+          }
+        });
+        
+        qrVideo.srcObject = stream;
+        qrVideo.play();
+        
+        qrVideo.onloadedmetadata = () => {
+          qrCanvas.width = qrVideo.videoWidth;
+          qrCanvas.height = qrVideo.videoHeight;
+          isScanning = true;
+          updateQRStatus('📷 相機已啟動，請對準 QR Code', 'success');
+          scanQRCode();
+        };
+        
+      } catch (error) {
+        console.error('相機啟動失敗:', error);
+        let errorMessage = '❌ 無法訪問相機';
+        
+        if (error.name === 'NotAllowedError') {
+          errorMessage = '❌ 相機權限被拒絕，請允許訪問相機';
+        } else if (error.name === 'NotFoundError') {
+          errorMessage = '❌ 找不到相機設備';
+        } else if (error.name === 'NotSupportedError') {
+          errorMessage = '❌ 瀏覽器不支援相機功能';
+        }
+        
+        updateQRStatus(errorMessage, 'error');
+      }
+    }
+
+    // 掃描 QR Code
+    function scanQRCode() {
+      if (!isScanning || !qrVideo || !qrCanvas || !qrContext) {
+        return;
+      }
+      
+      if (qrVideo.readyState === qrVideo.HAVE_ENOUGH_DATA) {
+        qrCanvas.width = qrVideo.videoWidth;
+        qrCanvas.height = qrVideo.videoHeight;
+        qrContext.drawImage(qrVideo, 0, 0, qrCanvas.width, qrCanvas.height);
+        
+        const imageData = qrContext.getImageData(0, 0, qrCanvas.width, qrCanvas.height);
+        const code = jsQR(imageData.data, imageData.width, imageData.height);
+        
+        if (code) {
+          updateQRStatus('✅ QR Code 掃描成功！正在載入...', 'success');
+          handleQRResult(code.data);
+          return;
+        }
+      }
+      
+      // 繼續掃描
+      requestAnimationFrame(scanQRCode);
+    }
+
+    // 處理 QR 掃描結果
+    function handleQRResult(data) {
+      try {
+        // 檢查是否為 Miruku Notes 分享連結
+        const url = new URL(data);
+        const sharedData = url.searchParams.get('data');
+        
+        if (sharedData) {
+          stopQRScanner();
+          loadSharedData(sharedData);
+        } else {
+          updateQRStatus('❌ 這不是 Miruku Notes 的分享 QR Code', 'error');
+          // 3秒後繼續掃描
+          setTimeout(() => {
+            if (isScanning) {
+              updateQRStatus('📷 繼續掃描 QR Code...', 'info');
+              scanQRCode();
+            }
+          }, 3000);
+        }
+        
+      } catch (error) {
+        updateQRStatus('❌ QR Code 格式錯誤', 'error');
+        // 3秒後繼續掃描
+        setTimeout(() => {
+          if (isScanning) {
+            updateQRStatus('📷 繼續掃描 QR Code...', 'info');
+            scanQRCode();
+          }
+        }, 3000);
+      }
+    }
+
+    // 載入分享數據
+    function loadSharedData(sharedData) {
+      try {
+        const decodedData = atob(sharedData);
+        const parsedData = JSON.parse(decodeURIComponent(decodedData));
+        
+        if (parsedData.notes && Array.isArray(parsedData.notes)) {
+          // 合併筆記
+          const mergedNotes = mergeNotes(notes, parsedData.notes);
+          notes = mergedNotes;
+          saveToLocal();
+          renderNotes();
+          
+          closeModal();
+          showStatus(`✅ 掃描成功！載入了 ${parsedData.notes.length} 篇筆記`, 'success');
+        } else {
+          showStatus('❌ QR Code 數據格式錯誤', 'error');
+        }
+        
+      } catch (error) {
+        showStatus('❌ QR Code 解析失敗', 'error');
+      }
+    }
+
+    // 停止 QR 掃描器
+    function stopQRScanner() {
+      isScanning = false;
+      
+      if (qrVideo && qrVideo.srcObject) {
+        const tracks = qrVideo.srcObject.getTracks();
+        tracks.forEach(track => track.stop());
+        qrVideo.srcObject = null;
+      }
+      
+      closeModal();
+    }
+
+    // 切換相機（前/後鏡頭）
+    async function switchCamera() {
+      if (!qrVideo) return;
+      
+      try {
+        // 停止當前攝影機
+        if (qrVideo.srcObject) {
+          const tracks = qrVideo.srcObject.getTracks();
+          tracks.forEach(track => track.stop());
+        }
+        
+        // 切換攝影機模式
+        const currentFacingMode = qrVideo.srcObject?.getVideoTracks()[0]?.getSettings()?.facingMode;
+        const newFacingMode = currentFacingMode === 'environment' ? 'user' : 'environment';
+        
+        updateQRStatus('🔄 正在切換相機...', 'info');
+        
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: newFacingMode,
+            width: { ideal: 1280 },
+            height: { ideal: 720 }
+          }
+        });
+        
+        qrVideo.srcObject = stream;
+        qrVideo.play();
+        
+        updateQRStatus('📷 相機已切換，請對準 QR Code', 'success');
+        
+      } catch (error) {
+        updateQRStatus('❌ 切換相機失敗', 'error');
+      }
+    }
+
+    // 更新 QR 掃描狀態
+    function updateQRStatus(message, type) {
+      const statusEl = document.getElementById('qrStatus');
+      if (statusEl) {
+        statusEl.textContent = message;
+        statusEl.style.background = type === 'success' ? 'rgba(46, 204, 113, 0.8)' :
+                                  type === 'error' ? 'rgba(231, 76, 60, 0.8)' :
+                                  type === 'info' ? 'rgba(52, 152, 219, 0.8)' :
+                                  'rgba(0, 0, 0, 0.7)';
+      }
+    }
 
     // 檢查 URL 參數
     function checkUrlParams() {
@@ -614,9 +1181,10 @@
         <textarea id="shareUrlInput" placeholder="貼上完整的分享連結..." style="height: 100px;"></textarea>
         <div style="margin: 15px 0;">
           <button onclick="loadFromShareUrl()" style="background: #3498db;">📥 載入筆記</button>
+          <button onclick="closeModal(); startQRScanner();" style="background: #e67e22;">📷 或掃描 QR Code</button>
         </div>
         <p style="font-size: 0.9em; color: #666;">
-          💡 貼上別人分享給你的連結，或掃描 QR Code 後複製連結
+          💡 貼上別人分享給你的連結，或關閉此窗口使用 QR Code 掃描功能
         </p>
       `);
     }
@@ -682,15 +1250,32 @@
 
     // 生成 QR Code（簡化版）
     function shareViaQR(url) {
-      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(url)}`;
+      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(url)}`;
       showShareModal('QR Code 分享', `
         <p>📱 <strong>掃描 QR Code：</strong></p>
-        <img src="${qrUrl}" alt="QR Code" style="max-width: 100%; margin: 15px 0;">
-        <p style="font-size: 0.9em; color: #666;">
-          用手機掃描此 QR Code 即可開啟分享連結
+        <img src="${qrUrl}" alt="QR Code" style="max-width: 100%; margin: 15px 0; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+        <p style="font-size: 0.9em; color: #666; margin: 15px 0;">
+          📷 在其他裝置用本應用的「掃描 QR Code」功能掃描
         </p>
-        <button onclick="copyToClipboard('${url}')" style="background: #2ecc71;">📋 複製連結</button>
+        <div style="margin: 15px 0;">
+          <button onclick="copyToClipboard('${url}')" style="background: #2ecc71;">📋 複製連結</button>
+          <button onclick="downloadQR('${qrUrl}')" style="background: #9b59b6;">💾 下載 QR Code</button>
+        </div>
+        <p style="font-size: 0.8em; color: #999;">
+          💡 你也可以用任何 QR Code 掃描 App 掃描後複製連結
+        </p>
       `);
+    }
+
+    // 下載 QR Code
+    function downloadQR(qrUrl) {
+      const a = document.createElement('a');
+      a.href = qrUrl;
+      a.download = `miruku-notes-qr-${Date.now()}.png`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      showStatus('📥 QR Code 已下載！', 'success');
     }
 
     // 顯示對話框
@@ -702,6 +1287,12 @@
 
     // 關閉對話框
     function closeModal() {
+      // 如果正在掃描 QR Code，先停止
+      if (isScanning) {
+        stopQRScanner();
+        return;
+      }
+      
       document.getElementById('shareModal').style.display = 'none';
     }
 
@@ -849,7 +1440,10 @@
     function toggleTheme() {
       const isDark = document.body.classList.toggle("dark");
       localStorage.setItem('miruku-theme', isDark ? 'dark' : 'light');
-      showStatus(`已切換到${isDark ? '暗色' : '亮色'}主題`, 'success');
+      
+      const themeText = isDark ? '深夜茶室模式' : '櫻花日光模式';
+      const themeEmoji = isDark ? '🌙' : '🌸';
+      showStatus(`${themeEmoji} 已切換到${themeText}`, 'success');
     }
 
     // 載入主題
@@ -988,13 +1582,18 @@
       
       if (e.key === 'Escape') {
         clearInputs();
-        closeModal();
+        // 如果正在掃描，停止掃描器
+        if (isScanning) {
+          stopQRScanner();
+        } else {
+          closeModal();
+        }
       }
     });
 
-    // 點擊對話框外部關閉
+    // 點擊對話框外部關閉（QR 掃描時不允許）
     document.getElementById('shareModal').addEventListener('click', function(e) {
-      if (e.target === this) {
+      if (e.target === this && !isScanning) {
         closeModal();
       }
     });
