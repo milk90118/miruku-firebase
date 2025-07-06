@@ -75,30 +75,45 @@
     function saveNote() {
       const content = document.getElementById("noteInput").value;
       const category = document.getElementById("categoryInput").value;
-      if (!content) return;
+      if (!content.trim()) {
+        console.warn("❌ 無內容，筆記未儲存");
+        return;
+      }
       db.collection("notes").add({
         uid: userId,
         content,
         category,
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(() => {
+      })
+      .then(() => {
+        console.log("✅ 筆記已儲存至 Firestore");
         document.getElementById("noteInput").value = "";
         document.getElementById("categoryInput").value = "";
+        loadNotes(); // 強制更新
+      })
+      .catch((error) => {
+        console.error("⚠️ 儲存筆記失敗：", error);
       });
     }
 
     function loadNotes() {
+      console.log("📥 正在載入筆記...");
       db.collection("notes").where("uid", "==", userId).orderBy("timestamp", "desc")
-        .onSnapshot(snapshot => {
+        .get()
+        .then(snapshot => {
           const container = document.getElementById("notes");
           container.innerHTML = "";
           snapshot.forEach(doc => {
             const data = doc.data();
+            console.log("📝 載入筆記：", data);
             const div = document.createElement("div");
             div.className = "note";
             div.innerHTML = `<strong>${data.category || '未分類'}</strong><br>${data.content}`;
             container.appendChild(div);
           });
+        })
+        .catch((error) => {
+          console.error("⚠️ 載入筆記失敗：", error);
         });
     }
 
